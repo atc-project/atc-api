@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+  atc-api:
+    build:
+      context: ./
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      DB_HOST: $DB_HOST
+      DB_PASSWORD: $DB_PASSWORD
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_USER: "atc"
+      POSTGRES_DB: "atc"
+
+
+

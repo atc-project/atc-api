@@ -1,0 +1,26 @@
+stages:
+  - deploy
+
+variables:
+  RELEASE_IMAGE: $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+  CONTAINER_NAME: $CI_PROJECT_NAME-gitlabci-$CI_COMMIT_REF_NAME
+  SECRET_KEY: $SECRET_KEY
+  DB_HOST: $DB_HOST
+  DB_PASS: $DB_PASSWORD
+
+
+
+deploy_master:
+  stage: deploy
+  script:
+    - docker-compose up -d --force-recreate
+  only:
+    - master
+  tags:
+    - atc-prod
+  variables:
+    SECRET_KEY: $SECRET_KEY
+    DB_HOST: $DB_HOST
+    DB_PASS: $DB_PASSWORD
+
+
