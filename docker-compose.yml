@@ -13,7 +13,6 @@ services:
       DB_PASSWORD: $DB_PASSWORD
     depends_on:
       - postgres
-    command: /bin/sh -c "/app/manage.py makemigrations --no-input && /app/manage.py migrate --no-input && /app/startup.sh"
 
   postgres:
     image: postgres
