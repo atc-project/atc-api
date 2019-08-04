@@ -5,6 +5,11 @@ from datetime import date
 
 
 class Category(models.Model):
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -12,6 +17,11 @@ class Category(models.Model):
 
 
 class Platform(models.Model):
+
+    class Meta:
+        verbose_name = "Platform"
+        verbose_name_plural = "Platforms"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -19,6 +29,11 @@ class Platform(models.Model):
 
 
 class LogType(models.Model):
+
+    class Meta:
+        verbose_name = "Log Type"
+        verbose_name_plural = "Log Types"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -26,6 +41,11 @@ class LogType(models.Model):
 
 
 class Channel(models.Model):
+
+    class Meta:
+        verbose_name = "Channel"
+        verbose_name_plural = "Channels"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -33,6 +53,11 @@ class Channel(models.Model):
 
 
 class Provider(models.Model):
+
+    class Meta:
+        verbose_name = "Provider"
+        verbose_name_plural = "Providers"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -40,6 +65,11 @@ class Provider(models.Model):
 
 
 class Volume(models.Model):
+
+    class Meta:
+        verbose_name = "Volume"
+        verbose_name_plural = "Volumes"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -47,6 +77,11 @@ class Volume(models.Model):
 
 
 class LogField(models.Model):
+
+    class Meta:
+        verbose_name = "Log Field"
+        verbose_name_plural = "Log Fields"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -54,6 +89,11 @@ class LogField(models.Model):
 
 
 class Stage(models.Model):
+
+    class Meta:
+        verbose_name = "Stage"
+        verbose_name_plural = "Stages"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -61,6 +101,11 @@ class Stage(models.Model):
 
 
 class EventID(models.Model):
+
+    class Meta:
+        verbose_name = "Event ID"
+        verbose_name_plural = "Event IDs"
+
     id = models.PositiveSmallIntegerField(primary_key=True)
 
     def __str__(self):
@@ -68,6 +113,11 @@ class EventID(models.Model):
 
 
 class Tag(models.Model):
+
+    class Meta:
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -75,6 +125,11 @@ class Tag(models.Model):
 
 
 class Reference(models.Model):
+
+    class Meta:
+        verbose_name = "Reference"
+        verbose_name_plural = "References"
+
     url = models.URLField()
 
     def __str__(self):
@@ -85,6 +140,10 @@ class Reference(models.Model):
 
 
 class LoggingPolicy(models.Model):
+
+    class Meta:
+        verbose_name = "Logging Policy"
+        verbose_name_plural = "Logging Policies"
 
     title = models.CharField(
         max_length=255,
@@ -130,6 +189,10 @@ class LoggingPolicy(models.Model):
 
 
 class DataNeeded(models.Model):
+
+    class Meta:
+        verbose_name = "Data Needed"
+        verbose_name_plural = "Data Needed"
 
     title = models.CharField(
         max_length=255,
@@ -213,6 +276,10 @@ class DataNeeded(models.Model):
 
 class Enrichment(models.Model):
 
+    class Meta:
+        verbose_name = "Enrichment"
+        verbose_name_plural = "Enrichments"
+
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
@@ -275,6 +342,10 @@ class Enrichment(models.Model):
 
 class ResponseAction(models.Model):
 
+    class Meta:
+        verbose_name = "Response Action"
+        verbose_name_plural = "Response Actions"
+
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
@@ -326,6 +397,10 @@ class ResponseAction(models.Model):
 
 
 class ResponsePlaybook(models.Model):
+
+    class Meta:
+        verbose_name = "Response Playbook"
+        verbose_name_plural = "Response Playbooks"
 
     title = models.CharField(
         max_length=255,
@@ -439,7 +514,11 @@ class ResponsePlaybook(models.Model):
         return self.title
 
 
-class DetectionRules(models.Model):
+class DetectionRule(models.Model):
+
+    class Meta:
+        verbose_name = "Detection Rule"
+        verbose_name_plural = "Detection Rules"
 
     title = models.CharField(
         max_length=255,
