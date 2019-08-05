@@ -3,7 +3,7 @@
 To run it you should have docker-compose installed ( https://docs.docker.com/compose/install/ ). 
 1. Set enviromental variables: 
 export SECRET_KEY="YOURSECRETKEY";
-export DB_HOST="postgres"; - this line should be constant
+export DB_HOST="postgres";
 export DB_PASSWORD="YOURDATABASEPASSWORD";
 
 2. Run docker-compose up -d 
