@@ -114,24 +114,24 @@ class DataNeededViewSet(viewsets.ModelViewSet):
 class EnrichmentViewSet(viewsets.ModelViewSet):
     queryset = models.Enrichment.objects.all()
     serializer_class = serializers.EnrichmentSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
 
 class ResponseActionViewSet(viewsets.ModelViewSet):
     queryset = models.ResponseAction.objects.all()
     serializer_class = serializers.ResponseActionSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
 
 class ResponsePlaybookViewSet(viewsets.ModelViewSet):
     queryset = models.ResponsePlaybook.objects.all()
     serializer_class = serializers.ResponsePlaybookSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
 
 class DetectionRuleViewSet(viewsets.ModelViewSet):
     queryset = models.DetectionRule.objects.all()
     serializer_class = serializers.DetectionRuleSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
 
