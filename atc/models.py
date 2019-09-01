@@ -109,7 +109,7 @@ class EventID(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Tag(models.Model):
@@ -166,17 +166,15 @@ class LoggingPolicy(models.Model):
         null=True
     )
 
-    event_id = models.ForeignKey(
+    event_id = models.ManyToManyField(
         EventID,
         verbose_name="Event ID(s)",
-        on_delete=models.SET_NULL,
         null=True
     )
 
-    reference = models.ForeignKey(
+    reference = models.ManyToManyField(
         Reference,
         verbose_name="Reference(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True
     )
 

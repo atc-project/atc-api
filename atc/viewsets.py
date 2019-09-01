@@ -38,6 +38,16 @@ class VolumeViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.VolumeSerializer
     permission_classes = (permissions.AllowAny,)
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        name = data['name']
+        if self.queryset.filter(name=name):
+            obj = self.queryset.filter(name=name).first()
+            self.kwargs['pk'] = obj.id
+            return super(VolumeViewSet, self).retrieve(request, *self.args, **self.kwargs)
+        return super(VolumeViewSet, self).create(request, *args, **kwargs)
+
+
 
 class LogFieldViewSet(viewsets.ModelViewSet):
     queryset = models.LogField.objects.all()
@@ -53,8 +63,17 @@ class StageViewSet(viewsets.ModelViewSet):
 
 class EventIdViewSet(viewsets.ModelViewSet):
     queryset = models.EventID.objects.all()
-    serializer_class = serializers.EventIdSerializer
+    serializer_class = serializers.EventIDSerializer
     permission_classes = (permissions.AllowAny,)
+    lookup_field = 'id'
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        event_id = data['id']
+        self.kwargs['id'] = event_id
+        if self.queryset.filter(id=event_id):
+            return super(EventIdViewSet, self).retrieve(request, *self.args, **self.kwargs)
+        return super(EventIdViewSet, self).create(request, *args, **kwargs)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -64,15 +83,26 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class ReferenceViewSet(viewsets.ModelViewSet):
-    queryset = models.Category.objects.all()
-    serializer_class = serializers.CategorySerializer
+    queryset = models.Reference.objects.all()
+    serializer_class = serializers.ReferenceSerializer
     permission_classes = (permissions.AllowAny,)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        url = data['url']
+        if self.queryset.filter(url=url):
+            obj = self.queryset.filter(url=url).first()
+            self.kwargs['pk'] = obj.id
+            return super(ReferenceViewSet, self).retrieve(request, *self.args, **self.kwargs)
+        return super(ReferenceViewSet, self).create(request, *args, **kwargs)
+
 
 
 class LoggingPolicyViewSet(viewsets.ModelViewSet):
     queryset = models.LoggingPolicy.objects.all()
     serializer_class = serializers.LoggingPolicySerializer
     permission_classes = (permissions.AllowAny,)
+
 
 
 class DataNeededViewSet(viewsets.ModelViewSet):

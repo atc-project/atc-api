@@ -1,107 +1,68 @@
+import inspect
+
 from rest_framework import serializers
 import atc.models as models
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Category
-        fields = '__all__'
-
+    pass
 
 class PlatformSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Platform
-        fields = '__all__'
-
+    pass
 
 class LogTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.LogType
-        fields = '__all__'
-
+    pass
 
 class ChannelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Channel
-        fields = '__all__'
-
+    pass
 
 class ProviderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Provider
-        fields = '__all__'
-
+    pass
 
 class VolumeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Volume
-        fields = '__all__'
-
+    pass
 
 class LogFieldSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.LogField
-        fields = '__all__'
-
+    pass
 
 class StageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Volume
-        fields = '__all__'
+    pass
 
-
-class EventIdSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.EventID
-        fields = '__all__'
-
+class EventIDSerializer(serializers.ModelSerializer):
+    pass
 
 class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Tag
-        fields = '__all__'
-
+    pass
 
 class ReferenceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Reference
-        fields = '__all__'
-
+    pass
 
 class LoggingPolicySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.LoggingPolicy
-        fields = '__all__'
-
+    pass
 
 class DataNeededSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DataNeeded
-        fields = '__all__'
-
+    pass
 
 class EnrichmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Enrichment
-        fields = '__all__'
-
+    pass
 
 class ResponseActionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ResponseAction
-        fields = '__all__'
-
+    pass
 
 class ResponsePlaybookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ResponsePlaybook
-        fields = '__all__'
-
+    pass
 
 class DetectionRuleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.DetectionRule
-        fields = '__all__'
+    pass
 
 
+for name, model_o in inspect.getmembers(models):
+    # a very dumb decision
+    class Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_o
+            fields = '__all__'
+
+
+    globals()[f'{name}Serializer'] = Serializer
 
