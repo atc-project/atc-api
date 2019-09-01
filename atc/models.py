@@ -201,22 +201,20 @@ class DataNeeded(models.Model):
         verbose_name="Description"
     )
 
-    logging_policy = models.ForeignKey(
+    logging_policy = models.ManyToManyField(
         LoggingPolicy,
         verbose_name="Logging Policy(ies)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="loggin_policy"
     )
 
-    reference = models.ForeignKey(
+    reference = models.ManyToManyField(
         Reference,
         verbose_name="Reference(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
     )
 
-    category = models.OneToOneField(
+    category = models.ForeignKey(
         Category,
         verbose_name="Category",
         on_delete=models.SET_NULL,
@@ -224,7 +222,7 @@ class DataNeeded(models.Model):
         related_name="category"
     )
 
-    platform = models.OneToOneField(
+    platform = models.ForeignKey(
         Platform,
         verbose_name="Platform",
         on_delete=models.SET_NULL,
@@ -232,7 +230,7 @@ class DataNeeded(models.Model):
         related_name="platform"
     )
 
-    log_type = models.OneToOneField(
+    log_type = models.ForeignKey(
         LogType,
         verbose_name="Log Type",
         on_delete=models.SET_NULL,
@@ -240,7 +238,7 @@ class DataNeeded(models.Model):
         related_name="log_type"
     )
 
-    channel = models.OneToOneField(
+    channel = models.ForeignKey(
         Channel,
         verbose_name="Channel",
         on_delete=models.SET_NULL,
@@ -248,7 +246,7 @@ class DataNeeded(models.Model):
         related_name="channel"
     )
 
-    provider = models.OneToOneField(
+    provider = models.ForeignKey(
         Provider,
         verbose_name="Provider",
         on_delete=models.SET_NULL,
@@ -256,10 +254,9 @@ class DataNeeded(models.Model):
         related_name="provider"
     )
 
-    log_field = models.OneToOneField(
+    log_field = models.ManyToManyField(
         LogField,
         verbose_name="Log Field(s)",
-        on_delete=models.SET_NULL,
         null=True,
         related_name="log_field"
     )
