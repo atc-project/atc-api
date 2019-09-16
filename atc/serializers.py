@@ -62,7 +62,70 @@ for name, model_o in inspect.getmembers(models):
         class Meta:
             model = model_o
             fields = '__all__'
+    if "dataneeded" not in name.lower():
+        globals()[f'{name}Serializer'] = Serializer
 
 
-    globals()[f'{name}Serializer'] = Serializer
+class DataNeededSerializer(serializers.ModelSerializer):
+
+    category = CategorySerializer()
+    reference = ReferenceSerializer(many=True)
+    logging_policy = LoggingPolicySerializer(many=True)
+    platform = PlatformSerializer()
+    log_type = LogTypeSerializer()
+    channel = ChannelSerializer()
+    provider = ProviderSerializer()
+    log_field = LogFieldSerializer(many=True)
+
+
+    class Meta:
+        model = models.DataNeeded
+        fields = '__all__'
+        depth = 2
+
+    def create(self, validated_data):
+        category_name = validated_data['category']['name']
+        category = models.Category.objects.get_or_create(name=category_name)[0]
+
+        platform_name = validated_data['platform']['name']
+        platform = models.Platform.objects.get_or_create(name=platform_name)[0]
+
+        log_type_name = validated_data['log_type']['name']
+        log_type = models.LogType.objects.get_or_create(name=log_type_name)[0]
+
+        channel_name = validated_data['channel']['name']
+        channel = models.Channel.objects.get_or_create(name=channel_name)[0]
+
+        provider_name = validated_data['provider']['name']
+        provider = models.Provider.objects.get_or_create(name=provider_name)[0]
+
+
+        obj_dict = {
+            "category": category,
+            "platform": platform,
+            "log_type": log_type,
+            "channel": channel,
+            "provider": provider,
+            "title": validated_data['title'],
+            "description": validated_data['description'],
+            "sample": validated_data['sample']
+
+        }
+        data_needed = models.DataNeeded.objects.get_or_create(**obj_dict)[0]
+        fields = validated_data['log_field']
+        for field_o in fields:
+            field = models.LogField.objects.get_or_create(name=field_o['name'])[0]
+            data_needed.log_field.add(field)
+
+        refs = validated_data['reference']
+        for ref in refs:
+            reference = models.Reference.objects.get_or_create(url=ref)[0]
+            data_needed.reference.add(reference)
+
+        for lp in validated_data['logging_policy']:
+            #TODO GET LP HERE
+            pass
+        data_needed.save()
+        return data_needed
+
 
