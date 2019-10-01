@@ -30,6 +30,7 @@ def export_dn(path_to_dn):
     dn['reference'] = arr
     arr=[]
     for lp in dn['loggingpolicy']:
+        # TODO SHOULD BE REAL LOGGING POLICY NOT THAT SHOULD BE LIKE lp = load_logging_policy() and arr.append(lp)
         arr.append({"title": lp, "description": "j", "default": "j", "config": "j"})
     dn['logging_policy'] = arr
 
