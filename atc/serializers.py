@@ -67,10 +67,9 @@ for name, model_o in inspect.getmembers(models):
 
 
 class DataNeededSerializer(serializers.ModelSerializer):
-
     category = CategorySerializer()
     reference = ReferenceSerializer(many=True)
-    logging_policy = LoggingPolicySerializer(many=True)
+    logging_policy = serializers.ListField(write_only=True)
     platform = PlatformSerializer()
     log_type = LogTypeSerializer()
     channel = ChannelSerializer()
@@ -111,6 +110,7 @@ class DataNeededSerializer(serializers.ModelSerializer):
             "sample": validated_data['sample']
 
         }
+
         data_needed = models.DataNeeded.objects.get_or_create(**obj_dict)[0]
         fields = validated_data['log_field']
         for field_o in fields:
@@ -122,10 +122,33 @@ class DataNeededSerializer(serializers.ModelSerializer):
             reference = models.Reference.objects.get_or_create(url=ref)[0]
             data_needed.reference.add(reference)
 
-        for lp in validated_data['logging_policy']:
-            #TODO GET LP HERE
-            pass
+        for lp_name in validated_data['logging_policy']:
+            lp = models.LoggingPolicy.objects.get_or_create(title=lp_name)[0]
+            data_needed.logging_policy.add(lp)
         data_needed.save()
         return data_needed
 
+
+class DetectionRuleSerializer(serializers.ModelSerializer):
+    data_needed_names = serializers.ListField(write_only=True)
+
+    class Meta:
+        model = models.DetectionRule
+        fields = '__all__'
+        depth = 1
+
+    def create(self, validated_data):
+        data_needed_names = validated_data['data_needed_names']
+        dn_list = []
+        for name in data_needed_names:
+            queryset = models.DataNeeded.objects.filter(title=name)
+            if len(queryset) > 0:
+                dn_list.append(queryset.first())
+
+            dr = models.DetectionRule.objects.create(title=validated_data['title'],
+                                                     description=validated_data['description'] )
+            for dn in dn_list:
+                dr.data_needed.add(dn)
+            dr.save()
+        return dr
 

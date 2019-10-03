@@ -1,5 +1,8 @@
 import requests
 import yaml
+import os
+
+
 
 def export_lp(path_to_lp):
     with open(path_to_lp, 'r') as stream:
@@ -10,7 +13,7 @@ def export_lp(path_to_lp):
             raise
 
     ids = []
-    for event_id in lp['eventID']:
+    for event_id in lp.get('eventID', []):
         to_send = {'id': event_id}
         r = requests.post("http://127.0.0.1:8000/api/v0/atc/eventid/", data=to_send)
         ids.append(r.json()['id'])
@@ -37,4 +40,6 @@ def export_lp(path_to_lp):
 
 
 if __name__ == '__main__':
-    export_lp("files/LP_0001_windows_audit_process_creation.yml")
+    path = 'atomic-threat-coverage/logging_policies'
+    for file in os.listdir(path):
+        export_lp(f'{path}/{file}')

@@ -510,11 +510,12 @@ class ResponsePlaybook(models.Model):
 
 
 class DetectionRule(models.Model):
-
     class Meta:
         verbose_name = "Detection Rule"
         verbose_name_plural = "Detection Rules"
 
+
+    data_needed = models.ManyToManyField(DataNeeded, null=True, blank=True)
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
