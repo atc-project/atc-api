@@ -1,8 +1,13 @@
 django
-djangorestframework
+djangorestframework=3.10
 markdown
 django-filter
 psycopg2-binary
 pytz
 sqlparse
-
+requests
+pyyaml
+requests
+jinja2
+elasticsearch
+pytest
