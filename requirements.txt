@@ -1,5 +1,5 @@
 django
-djangorestframework=3.10
+djangorestframework==3.10
 markdown
 django-filter
 psycopg2-binary
