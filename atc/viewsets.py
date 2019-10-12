@@ -137,6 +137,12 @@ class DetectionRuleViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def markdown(self, request, pk):
+        """
+        Function wich will return Respnse with markdown inside
+        :param request:
+        :param pk:
+        :return:
+        """
         pass
 
 
