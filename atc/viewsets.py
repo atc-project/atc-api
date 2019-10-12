@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions
 import atc.models as models
 import atc.serializers as serializers
+from rest_framework.decorators import action
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -133,5 +134,10 @@ class DetectionRuleViewSet(viewsets.ModelViewSet):
     queryset = models.DetectionRule.objects.all()
     serializer_class = serializers.DetectionRuleSerializer
     permission_classes = (permissions.AllowAny,)
+
+    @action(detail=True, methods=['get'])
+    def markdown(self, request, pk):
+        pass
+
 
 
