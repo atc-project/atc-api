@@ -2,8 +2,6 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from atc import viewsets
 
-
-
 router = DefaultRouter()
 router.register(r'category', viewsets.CategoryViewSet)
 router.register(r'platform', viewsets.PlatformViewSet)
@@ -22,14 +20,6 @@ router.register(r'enrichment', viewsets.EnrichmentViewSet)
 router.register(r'responseaction', viewsets.ResponseActionViewSet)
 router.register(r'responseplaybook', viewsets.ResponsePlaybookViewSet)
 router.register(r'detectionrule', viewsets.DetectionRuleViewSet)
-
-
-
-
-
-
-
-
 
 urlpatterns = [
     path('', include(router.urls)),

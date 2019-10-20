@@ -45,9 +45,10 @@ class VolumeViewSet(viewsets.ModelViewSet):
         if self.queryset.filter(name=name):
             obj = self.queryset.filter(name=name).first()
             self.kwargs['pk'] = obj.id
-            return super(VolumeViewSet, self).retrieve(request, *self.args, **self.kwargs)
+            return super(VolumeViewSet, self).retrieve(
+                request, *self.args, **self.kwargs
+            )
         return super(VolumeViewSet, self).create(request, *args, **kwargs)
-
 
 
 class LogFieldViewSet(viewsets.ModelViewSet):
@@ -73,7 +74,9 @@ class EventIdViewSet(viewsets.ModelViewSet):
         event_id = data['id']
         self.kwargs['id'] = event_id
         if self.queryset.filter(id=event_id):
-            return super(EventIdViewSet, self).retrieve(request, *self.args, **self.kwargs)
+            return super(EventIdViewSet, self).retrieve(
+                request, *self.args, **self.kwargs
+            )
         return super(EventIdViewSet, self).create(request, *args, **kwargs)
 
 
@@ -94,16 +97,16 @@ class ReferenceViewSet(viewsets.ModelViewSet):
         if self.queryset.filter(url=url):
             obj = self.queryset.filter(url=url).first()
             self.kwargs['pk'] = obj.id
-            return super(ReferenceViewSet, self).retrieve(request, *self.args, **self.kwargs)
+            return super(ReferenceViewSet, self).retrieve(
+                request, *self.args, **self.kwargs
+            )
         return super(ReferenceViewSet, self).create(request, *args, **kwargs)
-
 
 
 class LoggingPolicyViewSet(viewsets.ModelViewSet):
     queryset = models.LoggingPolicy.objects.all()
     serializer_class = serializers.LoggingPolicySerializer
     permission_classes = (permissions.AllowAny,)
-
 
 
 class DataNeededViewSet(viewsets.ModelViewSet):
@@ -144,6 +147,3 @@ class DetectionRuleViewSet(viewsets.ModelViewSet):
         :return:
         """
         pass
-
-
-

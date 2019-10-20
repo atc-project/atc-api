@@ -25,7 +25,7 @@ SECRET_KEY = '46g4*)t0sn&==+nx@3m8eo$p#u08fyo=$a#pq65av$dssgz&l7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['142.93.102.229', '127.0.0.1', '*.com']
+ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -83,16 +83,25 @@ WSGI_APPLICATION = 'atccore.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# sqlite3
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'atc',
-        'USER': 'atc',
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
     }
 }
+
+# postgres
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'atc',
+#         'USER': 'atc',
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST', 'localhost'),
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
