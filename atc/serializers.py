@@ -1,8 +1,9 @@
 from rest_framework import serializers
 import atc.models as models
+# from pprint import pprint
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -20,13 +21,13 @@ class CategorySerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
-class PlatformSerializer(serializers.ModelSerializer):
+class PlatformSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -44,13 +45,13 @@ class PlatformSerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
-class LogTypeSerializer(serializers.ModelSerializer):
+class LogTypeSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -59,22 +60,22 @@ class LogTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        log_type = models.LogType.objects.get_or_create(
+        type = models.LogType.objects.get_or_create(
             name=validated_data.get('name')
         )
-        return log_type
+        return type
 
     def update(self, instance, validated_data):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
-class ChannelSerializer(serializers.ModelSerializer):
+class ChannelSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -92,13 +93,13 @@ class ChannelSerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
-class ProviderSerializer(serializers.ModelSerializer):
+class ProviderSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -116,13 +117,13 @@ class ProviderSerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
-class VolumeSerializer(serializers.ModelSerializer):
+class VolumeSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -155,10 +156,10 @@ class LogFieldSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        log_field = models.LogField.objects.get_or_create(
+        field = models.LogField.objects.get_or_create(
             name=validated_data.get('name')
         )
-        return log_field
+        return field
 
     def update(self, instance, validated_data):
         return self.create(validated_data)
@@ -170,7 +171,7 @@ class LogFieldSerializer(serializers.ModelSerializer):
         return {"name": data}
 
 
-class StageSerializer(serializers.ModelSerializer):
+class StageSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -188,10 +189,10 @@ class StageSerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
 class EventIDSerializer(serializers.ModelSerializer):
@@ -218,7 +219,7 @@ class EventIDSerializer(serializers.ModelSerializer):
         return {"id": data}
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -236,10 +237,10 @@ class TagSerializer(serializers.ModelSerializer):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value.name
+        return value
 
     def to_internal_value(self, data):
-        return {"name": data}
+        return data
 
 
 class ReferencesSerializer(serializers.ModelSerializer):
@@ -265,6 +266,10 @@ class ReferencesSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         return {"url": data}
 
+# ################################################################ #
+# ################### Strict ATC Serializers ##################### #
+# ################################################################ #
+
 
 class LoggingPolicySerializer(serializers.ModelSerializer):
 
@@ -282,54 +287,136 @@ class LoggingPolicySerializer(serializers.ModelSerializer):
         volume = validated_data.pop('volume')
         references = validated_data.pop('references')
         if not instance:
-            logging_policy = models.LoggingPolicy.objects.get_or_create(
+            loggingpolicy = models.LoggingPolicy.objects.get_or_create(
                 title=validated_data['title']
-            )
-            logging_policy.description = validated_data.get('description')
-            logging_policy.default = validated_data.get('default')
-            logging_policy.configuration = validated_data.get('configuration')
+            )[0]
         else:
-            logging_policy = instance
+            loggingpolicy = instance
 
-        if logging_policy.eventID:
-            logging_policy.eventID.set([])
-        if logging_policy.references:
-            logging_policy.references.set([])
+        loggingpolicy.default = validated_data.get('default')
+        loggingpolicy.description = validated_data.get('description')
+        loggingpolicy.configuration = validated_data.get('configuration')
+
+        if loggingpolicy.eventID:
+            loggingpolicy.eventID.set([])
+        if loggingpolicy.references:
+            loggingpolicy.references.set([])
 
         vol = models.Volume.objects.get_or_create(name=volume['name'])
-        logging_policy.volume_id = vol[0].id
+        loggingpolicy.volume_id = vol[0].id
 
         for item in eventID:
             eid = models.EventID.objects.get_or_create(id=item['id'])
-            logging_policy.eventID.add(eid[0])
+            loggingpolicy.eventID.add(eid[0])
         for item in references:
             ref = models.References.objects.get_or_create(url=item['url'])
-            logging_policy.references.add(ref[0])
+            loggingpolicy.references.add(ref[0])
 
-        logging_policy.save()
-        return logging_policy
+        loggingpolicy.save()
+        return loggingpolicy
 
     def update(self, instance, validated_data):
         return self.create(validated_data, instance=instance)
 
-# class DataNeededSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = models.DataNeeded
-#         fields = '__all__'
+class LoggingPolicyViewSerializer(serializers.ModelSerializer):
+    """
+    This serializer is to be used when nested
+    """
+
+    class Meta:
+        model = models.LoggingPolicy
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return {"title": data}
+
+
+class DataNeededSerializer(serializers.ModelSerializer):
+
+    # Translate IDs to corresponding field values
+    category = CategorySerializer(source='category.name')
+    platform = PlatformSerializer(source='platform.name')
+    type = LogTypeSerializer(source='type.name')
+    channel = ChannelSerializer(source='channel.name')
+    provider = ProviderSerializer(source='provider.name')
+    loggingpolicy = LoggingPolicyViewSerializer(
+        many=True, allow_null=True
+    )
+    references = ReferencesSerializer(many=True, allow_null=True)
+    fields = LogFieldSerializer(many=True, allow_null=True)
+
+    class Meta:
+        model = models.DataNeeded
+        fields = '__all__'
+
+    def create(self, validated_data, instance=None):
+        category = validated_data.pop('category')
+        platform = validated_data.pop('platform')
+        type = validated_data.pop('type')
+        channel = validated_data.pop('channel')
+        provider = validated_data.pop('provider')
+        references = validated_data.pop('references')
+        loggingpolicy = validated_data.pop('loggingpolicy')
+        fields = validated_data.pop('fields')
+        if not instance:
+            dataneeded = models.DataNeeded.objects.get_or_create(
+                title=validated_data['title']
+            )[0]
+        else:
+            dataneeded = instance
+
+        dataneeded.description = validated_data.get('description')
+        dataneeded.sample = validated_data.get('sample')
+
+        if dataneeded.loggingpolicy:
+            dataneeded.loggingpolicy.set([])
+        if dataneeded.references:
+            dataneeded.references.set([])
+        if dataneeded.fields:
+            dataneeded.fields.set([])
+
+        obj = models.Category.objects.get_or_create(name=category['name'])[0]
+        dataneeded.category = obj
+        obj = models.Platform.objects.get_or_create(name=platform['name'])[0]
+        dataneeded.platform_id = obj.id
+        obj = models.LogType.objects.get_or_create(name=type['name'])[0]
+        dataneeded.type_id = obj.id
+        obj = models.Channel.objects.get_or_create(name=channel['name'])[0]
+        dataneeded.channel_id = obj.id
+        obj = models.Provider.objects.get_or_create(name=provider['name'])[0]
+        dataneeded.provider_id = obj.id
+
+        for item in references:
+            obj = models.References.objects.get_or_create(url=item['url'])
+            dataneeded.references.add(obj[0])
+
+        for item in fields:
+            obj = models.LogField.objects.get_or_create(name=item['name'])
+            dataneeded.fields.add(obj[0])
+
+        for item in loggingpolicy:
+            try:
+                obj = models.LoggingPolicy.objects.get(title=item['title'])
+            except:
+                raise serializers.ValidationError("Logging Policy not found")
+            dataneeded.loggingpolicy.add(obj)
+
+        dataneeded.save()
+        return dataneeded
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data, instance=instance)
 
 
 class EnrichmentSerializer(serializers.ModelSerializer):
 
     # Translate IDs to corresponding field values
-    data_needed = serializers.CharField(
-        source='data_needed.title',
-        allow_null=True, allow_blank=True
-    )
-    data_to_enrich = serializers.CharField(
-        source='data_to_enrich.title',
-        allow_null=True, allow_blank=True
-    )
+    data_needed = DataNeededSerializer()
+    data_to_enrich = DataNeededSerializer()
     requirement = serializers.CharField(
         source='requirement.name',
         allow_null=True, allow_blank=True
@@ -423,67 +510,67 @@ class ResponsePlaybookSerializer(serializers.ModelSerializer):
 #         globals()[f'{name}Serializer'] = Serializer
 
 
-class DataNeededSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    references = ReferencesSerializer(many=True)
-    logging_policy = serializers.ListField(write_only=True)
-    platform = PlatformSerializer()
-    log_type = LogTypeSerializer()
-    channel = ChannelSerializer()
-    provider = ProviderSerializer()
-    log_field = LogFieldSerializer(many=True)
+# class DataNeededSerializer(serializers.ModelSerializer):
+#     category = CategorySerializer()
+#     references = ReferencesSerializer(many=True)
+#     loggingpolicy = serializers.ListField(write_only=True)
+#     platform = PlatformSerializer()
+#     type = LogTypeSerializer()
+#     channel = ChannelSerializer()
+#     provider = ProviderSerializer()
+#     field = LogFieldSerializer(many=True)
 
-    class Meta:
-        model = models.DataNeeded
-        fields = '__all__'
-        depth = 2
+#     class Meta:
+#         model = models.DataNeeded
+#         fields = '__all__'
+#         depth = 2
 
-    def create(self, validated_data):
-        category_name = validated_data['category']['name']
-        category = models.Category.objects.get_or_create(name=category_name)[0]
+#     def create(self, validated_data):
+#         category_name = validated_data['category']['name']
+#         category = models.Category.objects.get_or_create(name=category_name)[0]
 
-        platform_name = validated_data['platform']['name']
-        platform = models.Platform.objects.get_or_create(name=platform_name)[0]
+#         platform_name = validated_data['platform']['name']
+#         platform = models.Platform.objects.get_or_create(name=platform_name)[0]
 
-        log_type_name = validated_data['log_type']['name']
-        log_type = models.LogType.objects.get_or_create(name=log_type_name)[0]
+#         type_name = validated_data['type']['name']
+#         type = models.LogType.objects.get_or_create(name=type_name)[0]
 
-        channel_name = validated_data['channel']['name']
-        channel = models.Channel.objects.get_or_create(name=channel_name)[0]
+#         channel_name = validated_data['channel']['name']
+#         channel = models.Channel.objects.get_or_create(name=channel_name)[0]
 
-        provider_name = validated_data['provider']['name']
-        provider = models.Provider.objects.get_or_create(name=provider_name)[0]
+#         provider_name = validated_data['provider']['name']
+#         provider = models.Provider.objects.get_or_create(name=provider_name)[0]
 
-        obj_dict = {
-            "category": category,
-            "platform": platform,
-            "log_type": log_type,
-            "channel": channel,
-            "provider": provider,
-            "title": validated_data['title'],
-            "description": validated_data['description'],
-            "sample": validated_data['sample']
+#         obj_dict = {
+#             "category": category,
+#             "platform": platform,
+#             "type": type,
+#             "channel": channel,
+#             "provider": provider,
+#             "title": validated_data['title'],
+#             "description": validated_data['description'],
+#             "sample": validated_data['sample']
 
-        }
+#         }
 
-        data_needed = models.DataNeeded.objects.get_or_create(**obj_dict)[0]
-        fields = validated_data['log_field']
-        for field_o in fields:
-            field = models.LogField.objects.get_or_create(
-                name=field_o['name']
-            )[0]
-            data_needed.log_field.add(field)
+#         data_needed = models.DataNeeded.objects.get_or_create(**obj_dict)[0]
+#         fields = validated_data['field']
+#         for field_o in fields:
+#             field = models.LogField.objects.get_or_create(
+#                 name=field_o['name']
+#             )[0]
+#             data_needed.field.add(field)
 
-        refs = validated_data['references']
-        for ref in refs:
-            references = models.References.objects.get_or_create(url=ref)[0]
-            data_needed.references.add(references)
+#         refs = validated_data['references']
+#         for ref in refs:
+#             references = models.References.objects.get_or_create(url=ref)[0]
+#             data_needed.references.add(references)
 
-        for lp_name in validated_data['logging_policy']:
-            lp = models.LoggingPolicy.objects.get_or_create(title=lp_name)[0]
-            data_needed.logging_policy.add(lp)
-        data_needed.save()
-        return data_needed
+#         for lp_name in validated_data['loggingpolicy']:
+#             lp = models.LoggingPolicy.objects.get_or_create(title=lp_name)[0]
+#             data_needed.loggingpolicy.add(lp)
+#         data_needed.save()
+#         return data_needed
 
 
 class DetectionRuleSerializer(serializers.ModelSerializer):

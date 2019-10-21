@@ -201,7 +201,7 @@ class DataNeeded(models.Model):
         verbose_name="Description"
     )
 
-    logging_policy = models.ManyToManyField(
+    loggingpolicy = models.ManyToManyField(
         LoggingPolicy,
         verbose_name="Logging Policy(ies)",
         null=True, blank=True,
@@ -230,12 +230,12 @@ class DataNeeded(models.Model):
         related_name="platform"
     )
 
-    log_type = models.ForeignKey(
+    type = models.ForeignKey(
         LogType,
         verbose_name="Log Type",
         on_delete=models.SET_NULL,
         null=True,
-        related_name="log_type"
+        related_name="type"
     )
 
     channel = models.ForeignKey(
@@ -254,11 +254,11 @@ class DataNeeded(models.Model):
         related_name="provider"
     )
 
-    log_field = models.ManyToManyField(
+    fields = models.ManyToManyField(
         LogField,
         verbose_name="Log Field(s)",
         null=True,
-        related_name="log_field"
+        related_name="fields"
     )
 
     sample = models.TextField(
