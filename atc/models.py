@@ -124,7 +124,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Reference(models.Model):
+class References(models.Model):
 
     class Meta:
         verbose_name = "Reference"
@@ -166,19 +166,19 @@ class LoggingPolicy(models.Model):
         null=True
     )
 
-    event_id = models.ManyToManyField(
+    eventID = models.ManyToManyField(
         EventID,
         verbose_name="Event ID(s)",
         null=True
     )
 
-    reference = models.ManyToManyField(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
         null=True, blank=True
     )
 
-    config = models.TextField(
+    configuration = models.TextField(
         verbose_name="Configuration"
     )
 
@@ -208,9 +208,9 @@ class DataNeeded(models.Model):
         related_name="loggin_policy"
     )
 
-    reference = models.ManyToManyField(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
         null=True, blank=True,
     )
 
@@ -307,9 +307,9 @@ class Enrichment(models.Model):
         null=True, blank=True,
     )
 
-    reference = models.ForeignKey(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ForeignKey(
+        References,
+        verbose_name="References(s)",
         on_delete=models.SET_NULL,
         null=True, blank=True,
     )
@@ -327,7 +327,7 @@ class Enrichment(models.Model):
         verbose_name="Author"
     )
 
-    config = models.TextField(
+    configuration = models.TextField(
         verbose_name="Config"
     )
 
@@ -350,12 +350,12 @@ class ResponseAction(models.Model):
         verbose_name="Description"
     )
 
-    reference = models.ForeignKey(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ForeignKey(
+        References,
+        verbose_name="References(s)",
         on_delete=models.SET_NULL,
         null=True, blank=True,
-        related_name="reference"
+        related_name="references"
     )
 
     author = models.CharField(

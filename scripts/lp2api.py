@@ -3,7 +3,6 @@ import yaml
 import os
 
 
-
 def export_lp(path_to_lp):
     with open(path_to_lp, 'r') as stream:
         try:

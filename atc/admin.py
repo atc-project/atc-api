@@ -44,7 +44,7 @@ class TagAdmin(admin.ModelAdmin):
     pass
 
 
-class ReferenceAdmin(admin.ModelAdmin):
+class ReferencesAdmin(admin.ModelAdmin):
     pass
 
 
@@ -82,7 +82,7 @@ admin.site.register(LogField, LogFieldAdmin)
 admin.site.register(Stage, StageAdmin)
 admin.site.register(EventID, EventIDAdmin)
 admin.site.register(Tag, TagAdmin)
-admin.site.register(Reference, ReferenceAdmin)
+admin.site.register(References, ReferencesAdmin)
 admin.site.register(LoggingPolicy, LoggingPolicyAdmin)
 admin.site.register(DataNeeded, DataNeededAdmin)
 admin.site.register(Enrichment, EnrichmentAdmin)

@@ -8,7 +8,7 @@ def export_dr(path_to_dr):
     dr = ATCutils.read_yaml_file(path_to_dr)
     dn = ATCutils.main_dn_calculatoin_func(path_to_dr)
     dr['data_needed_names'] = dn
-    r = requests.post('http://127.0.0.1:8000/api/v0/atc/detectionrule/', data=dr)
+    r = requests.post('http://127.0.0.1:8000/api/v0/atc/detectionrule/', json=dr)
     print(r)
 
 
