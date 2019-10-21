@@ -1,4 +1,17 @@
+**!!!!UNDER DEVELOPMENT!!!!**
+
 # This is an ATC-project API. 
+
+| Entity | Readiness |
+| --- | --- |
+| Logging Policy | Fully supported |
+| Data Needed | Fully supported |
+| Enrichments | Fully supported |
+| Response Actions | **NOT** supported |
+| Response Playbooks | **NOT** supported |
+| Detection Rules | **NOT** supported |
+
+# Docker
 
 To run it you should have docker-compose installed ( https://docs.docker.com/compose/install/ ). 
 1. Set enviromental variables: 
