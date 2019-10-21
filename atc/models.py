@@ -124,7 +124,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Reference(models.Model):
+class References(models.Model):
 
     class Meta:
         verbose_name = "Reference"
@@ -166,19 +166,19 @@ class LoggingPolicy(models.Model):
         null=True
     )
 
-    event_id = models.ManyToManyField(
+    eventID = models.ManyToManyField(
         EventID,
         verbose_name="Event ID(s)",
         null=True
     )
 
-    reference = models.ManyToManyField(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
         null=True, blank=True
     )
 
-    config = models.TextField(
+    configuration = models.TextField(
         verbose_name="Configuration"
     )
 
@@ -201,16 +201,16 @@ class DataNeeded(models.Model):
         verbose_name="Description"
     )
 
-    logging_policy = models.ManyToManyField(
+    loggingpolicy = models.ManyToManyField(
         LoggingPolicy,
         verbose_name="Logging Policy(ies)",
         null=True, blank=True,
         related_name="loggin_policy"
     )
 
-    reference = models.ManyToManyField(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
         null=True, blank=True,
     )
 
@@ -230,12 +230,12 @@ class DataNeeded(models.Model):
         related_name="platform"
     )
 
-    log_type = models.ForeignKey(
+    type = models.ForeignKey(
         LogType,
         verbose_name="Log Type",
         on_delete=models.SET_NULL,
         null=True,
-        related_name="log_type"
+        related_name="type"
     )
 
     channel = models.ForeignKey(
@@ -254,11 +254,11 @@ class DataNeeded(models.Model):
         related_name="provider"
     )
 
-    log_field = models.ManyToManyField(
+    fields = models.ManyToManyField(
         LogField,
         verbose_name="Log Field(s)",
         null=True,
-        related_name="log_field"
+        related_name="fields"
     )
 
     sample = models.TextField(
@@ -284,40 +284,35 @@ class Enrichment(models.Model):
         verbose_name="Description"
     )
 
-    data_needed = models.ForeignKey(
+    data_needed = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data Needed",
-        on_delete=models.SET_NULL,
         null=True,
         related_name='data_needed'
     )
 
-    data_to_enrich = models.ForeignKey(
+    data_to_enrich = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data to Enrich",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='data_to_enrich'
     )
 
-    requirement = models.ForeignKey(
+    requirements = models.ManyToManyField(
         "self",
         verbose_name="Requirement(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
     )
 
-    reference = models.ForeignKey(
-        Reference,
-        verbose_name="Reference(s)",
-        on_delete=models.SET_NULL,
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
         null=True, blank=True,
     )
 
-    new_field = models.ForeignKey(
+    new_fields = models.ManyToManyField(
         LogField,
         verbose_name="New field(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="new_field"
     )
@@ -350,12 +345,12 @@ class ResponseAction(models.Model):
         verbose_name="Description"
     )
 
-    reference = models.ForeignKey(
-        Reference,
-        verbose_name="Reference(s)",
+    references = models.ForeignKey(
+        References,
+        verbose_name="References(s)",
         on_delete=models.SET_NULL,
         null=True, blank=True,
-        related_name="reference"
+        related_name="references"
     )
 
     author = models.CharField(
@@ -510,12 +505,14 @@ class ResponsePlaybook(models.Model):
 
 
 class DetectionRule(models.Model):
+
     class Meta:
         verbose_name = "Detection Rule"
         verbose_name_plural = "Detection Rules"
 
-
-    data_needed = models.ManyToManyField(DataNeeded, null=True, blank=True)
+    data_needed = models.ManyToManyField(
+        DataNeeded, null=True, blank=True
+    )
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
