@@ -1,4 +1,4 @@
-**!!!!UNDER DEVELOPMENT!!!!**
+# **!!!!UNDER DEVELOPMENT!!!!**
 
 # This is an ATC-project API. 
 
@@ -10,6 +10,10 @@
 | Response Actions | **NOT** supported |
 | Response Playbooks | **NOT** supported |
 | Detection Rules | **NOT** supported |
+
+
+* Fully supported - User can view, insert and update the data
+* Partially supported - User can only view data
 
 # Docker
 
