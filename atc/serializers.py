@@ -3,7 +3,88 @@ import atc.models as models
 # from pprint import pprint
 
 
-class CategorySerializer(serializers.CharField):
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Category
+        fields = '__all__'
+
+
+class PlatformSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Platform
+        fields = '__all__'
+
+
+class LogTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.LogType
+        fields = '__all__'
+
+
+class ChannelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Channel
+        fields = '__all__'
+
+
+class ProviderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Provider
+        fields = '__all__'
+
+
+class VolumeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Volume
+        fields = '__all__'
+
+
+class LogFieldSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.LogField
+        fields = '__all__'
+
+
+class StageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Stage
+        fields = '__all__'
+
+
+class EventIDSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.EventID
+        fields = '__all__'
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Tag
+        fields = '__all__'
+
+
+class ReferencesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.References
+        fields = '__all__'
+
+# ################################################################ #
+# ################### Nested ATC Serializers ##################### #
+# ################################################################ #
+
+
+class CategorySerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -27,7 +108,7 @@ class CategorySerializer(serializers.CharField):
         return data
 
 
-class PlatformSerializer(serializers.CharField):
+class PlatformSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -51,7 +132,7 @@ class PlatformSerializer(serializers.CharField):
         return data
 
 
-class LogTypeSerializer(serializers.CharField):
+class LogTypeSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -75,7 +156,7 @@ class LogTypeSerializer(serializers.CharField):
         return data
 
 
-class ChannelSerializer(serializers.CharField):
+class ChannelSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -99,7 +180,7 @@ class ChannelSerializer(serializers.CharField):
         return data
 
 
-class ProviderSerializer(serializers.CharField):
+class ProviderSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -123,7 +204,7 @@ class ProviderSerializer(serializers.CharField):
         return data
 
 
-class VolumeSerializer(serializers.CharField):
+class VolumeSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -147,7 +228,7 @@ class VolumeSerializer(serializers.CharField):
         return data
 
 
-class LogFieldSerializer(serializers.ModelSerializer):
+class LogFieldSerializerNested(serializers.ModelSerializer):
 
     name = serializers.CharField()
 
@@ -171,7 +252,7 @@ class LogFieldSerializer(serializers.ModelSerializer):
         return {"name": data}
 
 
-class StageSerializer(serializers.CharField):
+class StageSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -195,7 +276,7 @@ class StageSerializer(serializers.CharField):
         return data
 
 
-class EventIDSerializer(serializers.ModelSerializer):
+class EventIDSerializerNested(serializers.ModelSerializer):
 
     id = serializers.IntegerField()
 
@@ -219,7 +300,7 @@ class EventIDSerializer(serializers.ModelSerializer):
         return {"id": data}
 
 
-class TagSerializer(serializers.CharField):
+class TagSerializerNested(serializers.CharField):
 
     name = serializers.CharField()
 
@@ -243,7 +324,7 @@ class TagSerializer(serializers.CharField):
         return data
 
 
-class ReferencesSerializer(serializers.ModelSerializer):
+class ReferencesSerializerNested(serializers.ModelSerializer):
 
     url = serializers.URLField()
 
@@ -274,9 +355,9 @@ class ReferencesSerializer(serializers.ModelSerializer):
 class LoggingPolicySerializer(serializers.ModelSerializer):
 
     # Translate IDs to corresponding field values
-    volume = VolumeSerializer(source='volume.name', allow_null=True)
-    eventID = EventIDSerializer(many=True, allow_null=True)
-    references = ReferencesSerializer(many=True, allow_null=True)
+    volume = VolumeSerializerNested(source='volume.name', allow_null=True)
+    eventID = EventIDSerializerNested(many=True, allow_null=True)
+    references = ReferencesSerializerNested(many=True, allow_null=True)
 
     class Meta:
         model = models.LoggingPolicy
@@ -338,16 +419,18 @@ class LoggingPolicyViewSerializer(serializers.ModelSerializer):
 class DataNeededSerializer(serializers.ModelSerializer):
 
     # Translate IDs to corresponding field values
-    category = CategorySerializer(source='category.name')
-    platform = PlatformSerializer(source='platform.name')
-    type = LogTypeSerializer(source='type.name')
-    channel = ChannelSerializer(source='channel.name')
-    provider = ProviderSerializer(source='provider.name')
+    category = CategorySerializerNested(source='category.name')
+    platform = PlatformSerializerNested(source='platform.name')
+    type = LogTypeSerializerNested(source='type.name')
+    channel = ChannelSerializerNested(source='channel.name')
+    provider = ProviderSerializerNested(source='provider.name')
     loggingpolicy = LoggingPolicyViewSerializer(
-        many=True, allow_null=True
+        many=True, allow_null=True, required=False
     )
-    references = ReferencesSerializer(many=True, allow_null=True)
-    fields = LogFieldSerializer(many=True, allow_null=True)
+    references = ReferencesSerializerNested(
+        many=True, allow_null=True, required=False)
+    fields = LogFieldSerializerNested(
+        many=True, allow_null=True, required=False)
 
     class Meta:
         model = models.DataNeeded
@@ -359,9 +442,18 @@ class DataNeededSerializer(serializers.ModelSerializer):
         type = validated_data.pop('type')
         channel = validated_data.pop('channel')
         provider = validated_data.pop('provider')
-        references = validated_data.pop('references')
-        loggingpolicy = validated_data.pop('loggingpolicy')
-        fields = validated_data.pop('fields')
+        if 'references' in validated_data:
+            references = validated_data.pop('references')
+        else:
+            references = []
+        if 'loggingpolicy' in validated_data:
+            loggingpolicy = validated_data.pop('loggingpolicy')
+        else:
+            loggingpolicy = []
+        if 'fields' in validated_data:
+            fields = validated_data.pop('fields')
+        else:
+            fields = []
         if not instance:
             dataneeded = models.DataNeeded.objects.get_or_create(
                 title=validated_data['title']
@@ -371,13 +463,6 @@ class DataNeededSerializer(serializers.ModelSerializer):
 
         dataneeded.description = validated_data.get('description')
         dataneeded.sample = validated_data.get('sample')
-
-        if dataneeded.loggingpolicy:
-            dataneeded.loggingpolicy.set([])
-        if dataneeded.references:
-            dataneeded.references.set([])
-        if dataneeded.fields:
-            dataneeded.fields.set([])
 
         obj = models.Category.objects.get_or_create(name=category['name'])[0]
         dataneeded.category = obj
@@ -389,6 +474,13 @@ class DataNeededSerializer(serializers.ModelSerializer):
         dataneeded.channel_id = obj.id
         obj = models.Provider.objects.get_or_create(name=provider['name'])[0]
         dataneeded.provider_id = obj.id
+
+        if dataneeded.references:
+            dataneeded.references.set([])
+        if dataneeded.fields:
+            dataneeded.fields.set([])
+        if dataneeded.loggingpolicy:
+            dataneeded.loggingpolicy.set([])
 
         for item in references:
             obj = models.References.objects.get_or_create(url=item['url'])
@@ -402,7 +494,10 @@ class DataNeededSerializer(serializers.ModelSerializer):
             try:
                 obj = models.LoggingPolicy.objects.get(title=item['title'])
             except:
-                raise serializers.ValidationError("Logging Policy not found")
+                raise serializers.ValidationError(
+                    f"Logging Policy {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
             dataneeded.loggingpolicy.add(obj)
 
         dataneeded.save()
@@ -412,27 +507,139 @@ class DataNeededSerializer(serializers.ModelSerializer):
         return self.create(validated_data, instance=instance)
 
 
+class DataNeededViewSerializer(serializers.ModelSerializer):
+    """
+    This serializer is to be used when nested
+    """
+
+    class Meta:
+        model = models.DataNeeded
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return {"title": data}
+
+
+class EnrichmentListSerializer(serializers.ModelSerializer):
+    """
+    Dirty solution as I don't know how to point to "self" in serializer
+    """
+
+    title = serializers.CharField()
+
+    class Meta:
+        model = models.Enrichment
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return {"title": data}
+
+
 class EnrichmentSerializer(serializers.ModelSerializer):
 
-    # Translate IDs to corresponding field values
-    data_needed = DataNeededSerializer()
-    data_to_enrich = DataNeededSerializer()
-    requirement = serializers.CharField(
-        source='requirement.name',
-        allow_null=True, allow_blank=True
-    )
-    references = serializers.CharField(
-        source='references.name',
-        allow_null=True, allow_blank=True
-    )
-    new_field = serializers.CharField(
-        source='new_field.name',
-        allow_null=True, allow_blank=True
-    )
+    data_needed = DataNeededViewSerializer(many=True)
+    data_to_enrich = DataNeededViewSerializer(
+        many=True, allow_null=True, required=False)
+    requirements = EnrichmentListSerializer(
+        many=True, allow_null=True, required=False)
+    references = ReferencesSerializerNested(
+        many=True, allow_null=True, required=False)
+    new_fields = LogFieldSerializerNested(
+        many=True, allow_null=True, required=False)
 
     class Meta:
         model = models.Enrichment
         fields = '__all__'
+
+    def create(self, validated_data, instance=None):
+        data_needed = validated_data.pop('data_needed')
+        if 'data_to_enrich' in validated_data:
+            data_to_enrich = validated_data.pop('data_to_enrich')
+        else:
+            data_to_enrich = []
+        if 'requirements' in validated_data:
+            requirements = validated_data.pop('requirements')
+        else:
+            requirements = []
+        if 'references' in validated_data:
+            references = validated_data.pop('references')
+        else:
+            references = []
+        if 'new_fields' in validated_data:
+            new_fields = validated_data.pop('new_fields')
+        else:
+            new_fields = []
+
+        if not instance:
+            enrichment = models.Enrichment.objects.get_or_create(
+                title=validated_data['title']
+            )[0]
+        else:
+            enrichment = instance
+
+        enrichment.description = validated_data.get('description')
+        enrichment.author = validated_data.get('author')
+        enrichment.config = validated_data.get('config')
+        if enrichment.data_needed:
+            enrichment.data_needed.set([])
+        if enrichment.data_to_enrich:
+            enrichment.data_to_enrich.set([])
+        if enrichment.requirements:
+            enrichment.requirements.set([])
+        if enrichment.references:
+            enrichment.references.set([])
+        if enrichment.new_fields:
+            enrichment.new_fields.set([])
+
+        for item in data_needed:
+            try:
+                obj = models.DataNeeded.objects.get(title=item['title'])
+            except:
+                raise serializers.ValidationError(
+                    f"Data Needed {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
+            enrichment.data_needed.add(obj)
+
+        for item in data_to_enrich:
+            try:
+                obj = models.DataNeeded.objects.get(title=item['title'])
+            except:
+                raise serializers.ValidationError(
+                    f"Data Needed {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
+            enrichment.data_to_enrich.add(obj)
+
+        for item in requirements:
+            try:
+                obj = models.Enrichment.objects.get(title=item['title'])
+            except:
+                raise serializers.ValidationError(
+                    f"Enrichment {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
+            enrichment.requirements.add(obj)
+
+        for item in references:
+            obj = models.References.objects.get_or_create(url=item['url'])
+            enrichment.references.add(obj[0])
+
+        for item in new_fields:
+            obj = models.LogField.objects.get_or_create(name=item['name'])
+            enrichment.new_fields.add(obj[0])
+
+        enrichment.save()
+        return enrichment
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data, instance=instance)
 
 
 class ResponseActionSerializer(serializers.ModelSerializer):
@@ -487,90 +694,6 @@ class ResponsePlaybookSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ResponsePlaybook
         fields = '__all__'
-
-
-# class DetectionRuleSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = models.DetectionRule
-#         fields = '__all__'
-
-
-# ------------------------------------------------------------------
-# --------- Don't know yet how to understand code below ------------
-# ------------------------------------------------------------------
-
-# for name, model_o in inspect.getmembers(models):
-#     # a very dumb decision
-#     class Serializer(serializers.ModelSerializer):
-#         class Meta:
-#             model = model_o
-#             fields = '__all__'
-#     if "dataneeded" not in name.lower():
-#         globals()[f'{name}Serializer'] = Serializer
-
-
-# class DataNeededSerializer(serializers.ModelSerializer):
-#     category = CategorySerializer()
-#     references = ReferencesSerializer(many=True)
-#     loggingpolicy = serializers.ListField(write_only=True)
-#     platform = PlatformSerializer()
-#     type = LogTypeSerializer()
-#     channel = ChannelSerializer()
-#     provider = ProviderSerializer()
-#     field = LogFieldSerializer(many=True)
-
-#     class Meta:
-#         model = models.DataNeeded
-#         fields = '__all__'
-#         depth = 2
-
-#     def create(self, validated_data):
-#         category_name = validated_data['category']['name']
-#         category = models.Category.objects.get_or_create(name=category_name)[0]
-
-#         platform_name = validated_data['platform']['name']
-#         platform = models.Platform.objects.get_or_create(name=platform_name)[0]
-
-#         type_name = validated_data['type']['name']
-#         type = models.LogType.objects.get_or_create(name=type_name)[0]
-
-#         channel_name = validated_data['channel']['name']
-#         channel = models.Channel.objects.get_or_create(name=channel_name)[0]
-
-#         provider_name = validated_data['provider']['name']
-#         provider = models.Provider.objects.get_or_create(name=provider_name)[0]
-
-#         obj_dict = {
-#             "category": category,
-#             "platform": platform,
-#             "type": type,
-#             "channel": channel,
-#             "provider": provider,
-#             "title": validated_data['title'],
-#             "description": validated_data['description'],
-#             "sample": validated_data['sample']
-
-#         }
-
-#         data_needed = models.DataNeeded.objects.get_or_create(**obj_dict)[0]
-#         fields = validated_data['field']
-#         for field_o in fields:
-#             field = models.LogField.objects.get_or_create(
-#                 name=field_o['name']
-#             )[0]
-#             data_needed.field.add(field)
-
-#         refs = validated_data['references']
-#         for ref in refs:
-#             references = models.References.objects.get_or_create(url=ref)[0]
-#             data_needed.references.add(references)
-
-#         for lp_name in validated_data['loggingpolicy']:
-#             lp = models.LoggingPolicy.objects.get_or_create(title=lp_name)[0]
-#             data_needed.loggingpolicy.add(lp)
-#         data_needed.save()
-#         return data_needed
 
 
 class DetectionRuleSerializer(serializers.ModelSerializer):

@@ -284,40 +284,35 @@ class Enrichment(models.Model):
         verbose_name="Description"
     )
 
-    data_needed = models.ForeignKey(
+    data_needed = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data Needed",
-        on_delete=models.SET_NULL,
         null=True,
         related_name='data_needed'
     )
 
-    data_to_enrich = models.ForeignKey(
+    data_to_enrich = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data to Enrich",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='data_to_enrich'
     )
 
-    requirement = models.ForeignKey(
+    requirements = models.ManyToManyField(
         "self",
         verbose_name="Requirement(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
     )
 
-    references = models.ForeignKey(
+    references = models.ManyToManyField(
         References,
         verbose_name="References(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
     )
 
-    new_field = models.ForeignKey(
+    new_fields = models.ManyToManyField(
         LogField,
         verbose_name="New field(s)",
-        on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="new_field"
     )
@@ -327,7 +322,7 @@ class Enrichment(models.Model):
         verbose_name="Author"
     )
 
-    configuration = models.TextField(
+    config = models.TextField(
         verbose_name="Config"
     )
 

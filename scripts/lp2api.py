@@ -6,7 +6,7 @@ from pprint import pprint
 
 path_to_lp = (
     "/home/ubuntu/projects/atc-api/tests/files/"
-    "LP_0001_windows_audit_process_creation.yml"
+    "LP_0003_windows_sysmon_process_creation.yml"
 )
 
 with open(path_to_lp, 'r') as stream:

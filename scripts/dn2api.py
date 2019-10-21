@@ -6,7 +6,7 @@ from pprint import pprint
 
 path_to_dn = (
     "/home/ubuntu/projects/atc-api/tests/files/"
-    "DN_0001_4688_windows_process_creation.yml"
+    "DN_0003_1_windows_sysmon_process_creation.yml"
 )
 
 with open(path_to_dn, 'r') as stream:
