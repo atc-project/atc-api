@@ -240,24 +240,25 @@ class ReferencesViewSet(viewsets.ReadOnlyModelViewSet):
 class LoggingPolicyFilter(filters.FilterSet):
 
     title_contains = filters.CharFilter(
-        field_name='title', lookup_expr='icontains'
+        field_name='title', lookup_expr='icontains',
+        distinct=True
     )
     title_exact = filters.CharFilter(
-        field_name='title', lookup_expr='iexact'
+        field_name='title', lookup_expr='iexact',
+        distinct=True
     )
-    eventID_exact = filters.NumberFilter(
-        field_name='eventID', lookup_expr='exact'
+    eventID_exact = filters.CharFilter(
+        field_name='eventID', lookup_expr='exact',
+        distinct=True
     )
     volume_exact = filters.CharFilter(
-        field_name='volume', lookup_expr='name__iexact'
+        field_name='volume', lookup_expr='name__iexact',
+        distinct=True
     )
 
     class Meta:
         model = models.LoggingPolicy
-        fields = [
-            "title_contains", "title_exact", "eventID_exact",
-            "volume_exact"
-        ]
+        fields = []
 
 
 class LoggingPolicyViewSet(viewsets.ModelViewSet):
@@ -283,58 +284,66 @@ class LoggingPolicyViewSet(viewsets.ModelViewSet):
 class DataNeededFilter(filters.FilterSet):
 
     loggingpolicy_contains = filters.CharFilter(
-        field_name='loggingpolicy', lookup_expr='title__icontains'
+        field_name='loggingpolicy', lookup_expr='title__icontains',
+        distinct=True
     )
     title_contains = filters.CharFilter(
-        field_name='title', lookup_expr='icontains'
+        field_name='title', lookup_expr='icontains',
+        distinct=True
     )
     category_contains = filters.CharFilter(
-        field_name='category', lookup_expr='name__icontains'
+        field_name='category', lookup_expr='name__icontains',
+        distinct=True
     )
     channel_contains = filters.CharFilter(
-        field_name='channel', lookup_expr='name__icontains'
+        field_name='channel', lookup_expr='name__icontains',
+        distinct=True
     )
     platform_contains = filters.CharFilter(
-        field_name='platform', lookup_expr='name__icontains'
+        field_name='platform', lookup_expr='name__icontains',
+        distinct=True
     )
     provider_contains = filters.CharFilter(
-        field_name='provider', lookup_expr='name__icontains'
+        field_name='provider', lookup_expr='name__icontains',
+        distinct=True
     )
     fields_contains = filters.CharFilter(
-        field_name='fields', lookup_expr='name__icontains'
+        field_name='fields', lookup_expr='name__icontains',
+        distinct=True
     )
 
     loggingpolicy_exact = filters.CharFilter(
-        field_name='loggingpolicy', lookup_expr='title__iexact'
+        field_name='loggingpolicy', lookup_expr='title__iexact',
+        distinct=True
     )
     title_exact = filters.CharFilter(
-        field_name='title', lookup_expr='iexact'
+        field_name='title', lookup_expr='iexact',
+        distinct=True
     )
     category_exact = filters.CharFilter(
-        field_name='category', lookup_expr='name__iexact'
+        field_name='category', lookup_expr='name__iexact',
+        distinct=True
     )
     channel_exact = filters.CharFilter(
-        field_name='channel', lookup_expr='name__iexact'
+        field_name='channel', lookup_expr='name__iexact',
+        distinct=True
     )
     platform_exact = filters.CharFilter(
-        field_name='platform', lookup_expr='name__iexact'
+        field_name='platform', lookup_expr='name__iexact',
+        distinct=True
     )
     provider_exact = filters.CharFilter(
-        field_name='provider', lookup_expr='name__iexact'
+        field_name='provider', lookup_expr='name__iexact',
+        distinct=True
     )
     fields_exact = filters.CharFilter(
-        field_name='fields', lookup_expr='name__iexact'
+        field_name='fields', lookup_expr='name__iexact',
+        distinct=True
     )
 
     class Meta:
         model = models.DataNeeded
-        fields = [
-            "loggingpolicy_contains", "title_contains", "category_contains",
-            "channel_contains", "platform_contains", "provider_contains",
-            "fields_contains", "loggingpolicy_exact", "title_exact",
-            "category_exact", "channel_exact", "platform_exact",
-            "provider_exact", "fields_exact"
-        ]
+        fields = []
 
 
 class DataNeededViewSet(viewsets.ModelViewSet):
@@ -357,10 +366,60 @@ class DataNeededViewSet(viewsets.ModelViewSet):
         )
 
 
+class EnrichmentFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains',
+        distinct=True
+    )
+    data_needed_contains = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__icontains',
+        distinct=True
+    )
+    data_to_enrich_contains = filters.CharFilter(
+        field_name='data_to_enrich', lookup_expr='title__icontains',
+        distinct=True
+    )
+    requirements_contains = filters.CharFilter(
+        field_name='requirements', lookup_expr='title__icontains',
+        distinct=True
+    )
+    new_fields_contains = filters.CharFilter(
+        field_name='new_fields', lookup_expr='name__icontains',
+        distinct=True
+    )
+
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact',
+        distinct=True
+    )
+    data_needed_exact = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__iexact',
+        distinct=True
+    )
+    data_to_enrich_exact = filters.CharFilter(
+        field_name='data_to_enrich', lookup_expr='title__iexact',
+        distinct=True
+    )
+    requirements_exact = filters.CharFilter(
+        field_name='requirements', lookup_expr='title__iexact',
+        distinct=True
+    )
+    new_fields_exact = filters.CharFilter(
+        field_name='new_fields', lookup_expr='name__iexact',
+        distinct=True
+    )
+
+    class Meta:
+        model = models.Enrichment
+        fields = []
+
+
 class EnrichmentViewSet(viewsets.ModelViewSet):
     queryset = models.Enrichment.objects.all()
     serializer_class = serializers.EnrichmentSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = EnrichmentFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
