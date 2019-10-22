@@ -1,6 +1,8 @@
-from rest_framework import viewsets, permissions
 import atc.models as models
 import atc.serializers as serializers
+
+from rest_framework import viewsets, permissions
+from django_filters import rest_framework as filters
 # from rest_framework.decorators import action
 
 
@@ -235,10 +237,34 @@ class ReferencesViewSet(viewsets.ReadOnlyModelViewSet):
 # ################################################################ #
 
 
+class LoggingPolicyFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains'
+    )
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact'
+    )
+    eventID_exact = filters.NumberFilter(
+        field_name='eventID', lookup_expr='exact'
+    )
+    volume_exact = filters.CharFilter(
+        field_name='volume', lookup_expr='name__iexact'
+    )
+
+    class Meta:
+        model = models.LoggingPolicy
+        fields = [
+            "title_contains", "title_exact", "eventID_exact",
+            "volume_exact"
+        ]
+
+
 class LoggingPolicyViewSet(viewsets.ModelViewSet):
     queryset = models.LoggingPolicy.objects.all()
     serializer_class = serializers.LoggingPolicySerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = LoggingPolicyFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -254,10 +280,68 @@ class LoggingPolicyViewSet(viewsets.ModelViewSet):
         )
 
 
+class DataNeededFilter(filters.FilterSet):
+
+    loggingpolicy_contains = filters.CharFilter(
+        field_name='loggingpolicy', lookup_expr='title__icontains'
+    )
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains'
+    )
+    category_contains = filters.CharFilter(
+        field_name='category', lookup_expr='name__icontains'
+    )
+    channel_contains = filters.CharFilter(
+        field_name='channel', lookup_expr='name__icontains'
+    )
+    platform_contains = filters.CharFilter(
+        field_name='platform', lookup_expr='name__icontains'
+    )
+    provider_contains = filters.CharFilter(
+        field_name='provider', lookup_expr='name__icontains'
+    )
+    fields_contains = filters.CharFilter(
+        field_name='fields', lookup_expr='name__icontains'
+    )
+
+    loggingpolicy_exact = filters.CharFilter(
+        field_name='loggingpolicy', lookup_expr='title__iexact'
+    )
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact'
+    )
+    category_exact = filters.CharFilter(
+        field_name='category', lookup_expr='name__iexact'
+    )
+    channel_exact = filters.CharFilter(
+        field_name='channel', lookup_expr='name__iexact'
+    )
+    platform_exact = filters.CharFilter(
+        field_name='platform', lookup_expr='name__iexact'
+    )
+    provider_exact = filters.CharFilter(
+        field_name='provider', lookup_expr='name__iexact'
+    )
+    fields_exact = filters.CharFilter(
+        field_name='fields', lookup_expr='name__iexact'
+    )
+
+    class Meta:
+        model = models.DataNeeded
+        fields = [
+            "loggingpolicy_contains", "title_contains", "category_contains",
+            "channel_contains", "platform_contains", "provider_contains",
+            "fields_contains", "loggingpolicy_exact", "title_exact",
+            "category_exact", "channel_exact", "platform_exact",
+            "provider_exact", "fields_exact"
+        ]
+
+
 class DataNeededViewSet(viewsets.ModelViewSet):
     queryset = models.DataNeeded.objects.all()
     serializer_class = serializers.DataNeededSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = DataNeededFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data

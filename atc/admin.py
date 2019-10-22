@@ -53,7 +53,7 @@ class LoggingPolicyAdmin(admin.ModelAdmin):
 
 
 class DataNeededAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('title', 'category')
 
 
 class EnrichmentAdmin(admin.ModelAdmin):

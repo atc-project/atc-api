@@ -355,18 +355,33 @@ class ReferencesSerializerNested(serializers.ModelSerializer):
 class LoggingPolicySerializer(serializers.ModelSerializer):
 
     # Translate IDs to corresponding field values
-    volume = VolumeSerializerNested(source='volume.name', allow_null=True)
-    eventID = EventIDSerializerNested(many=True, allow_null=True)
-    references = ReferencesSerializerNested(many=True, allow_null=True)
+    volume = VolumeSerializerNested(
+        source='volume.name', allow_null=True, required=False
+    )
+    eventID = EventIDSerializerNested(
+        many=True, allow_null=True, required=False
+    )
+    references = ReferencesSerializerNested(
+        many=True, allow_null=True, required=False
+    )
 
     class Meta:
         model = models.LoggingPolicy
         fields = '__all__'
 
     def create(self, validated_data, instance=None):
-        eventID = validated_data.pop('eventID')
-        volume = validated_data.pop('volume')
-        references = validated_data.pop('references')
+        if 'eventID' in validated_data:
+            eventID = validated_data.pop('eventID')
+        else:
+            eventID = []
+        if 'volume' in validated_data:
+            volume = validated_data.pop('volume')
+        else:
+            volume = []
+        if 'references' in validated_data:
+            references = validated_data.pop('references')
+        else:
+            references = []
         if not instance:
             loggingpolicy = models.LoggingPolicy.objects.get_or_create(
                 title=validated_data['title']
@@ -483,17 +498,22 @@ class DataNeededSerializer(serializers.ModelSerializer):
             dataneeded.loggingpolicy.set([])
 
         for item in references:
-            obj = models.References.objects.get_or_create(url=item['url'])
-            dataneeded.references.add(obj[0])
+            obj = models.References.objects.get_or_create(url=item['url'])[0]
+            dataneeded.references.add(obj)
 
         for item in fields:
-            obj = models.LogField.objects.get_or_create(name=item['name'])
-            dataneeded.fields.add(obj[0])
+            obj = models.LogField.objects.get_or_create(name=item['name'])[0]
+            dataneeded.fields.add(obj)
+
+        omit_lps = ["none", "todo", "to-do"]
 
         for item in loggingpolicy:
             try:
                 obj = models.LoggingPolicy.objects.get(title=item['title'])
             except:
+                if item['title'].lower() in omit_lps:
+                    continue
+                dataneeded.delete()
                 raise serializers.ValidationError(
                     f"Logging Policy {item['title']} not found. "
                     "Push it first before referencing it."

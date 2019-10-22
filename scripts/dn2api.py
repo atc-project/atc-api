@@ -3,19 +3,24 @@
 import requests
 import yaml
 from pprint import pprint
+from os import walk
 
-path_to_dn = (
-    "/home/ubuntu/projects/atc-api/tests/files/"
-    "DN_0003_1_windows_sysmon_process_creation.yml"
-)
+lp_dir = '/home/ubuntu/projects/atomic-threat-coverage/data_needed'
 
-with open(path_to_dn, 'r') as stream:
-    dn = yaml.safe_load(stream)
+dirpath, _, filenames = next(walk(lp_dir))
 
-# pprint(dn)
+for file in filenames:
 
-r = requests.post(
-    'http://127.0.0.1:8000/api/v1/atc/dataneeded/',
-    json=dn
-)
-pprint(r.text)
+    with open(dirpath + "/" + file, 'r') as stream:
+        dn = yaml.safe_load(stream)
+
+    r = requests.post(
+        'http://127.0.0.1:8000/api/v1/atc/dataneeded/',
+        json=dn
+    )
+
+    if r.status_code != 200:
+        pprint(file)
+        pprint(r.text)
+
+# pprint(r.text)
