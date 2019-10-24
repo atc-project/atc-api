@@ -58,9 +58,9 @@ references:
     - https://www.torproject.org/
 configuration: |
   Again, any new lines have to escaped
-  ```
+  ``
   somecode
-  ```
+  ``
 ```
 
 ### Python snippet for inserting data
@@ -81,8 +81,11 @@ r = requests.post(
 
 There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
 
+#### Contains
+
 * `title_contains`
 
+#### Exact
 
 * `title_exact`
 * `eventID_exact`
@@ -108,7 +111,7 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 }
 ```
 
-### ATC Logging Policy yaml file
+### ATC Data Needed yaml file
 
 ```yaml
 title: Data Needed #0001
@@ -150,6 +153,8 @@ r = requests.post(
 
 There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
 
+#### Contains
+
 * `loggingpolicy_contains`
 * `title_contains`
 * `category_contains`
@@ -158,6 +163,7 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 * `provider_contains`
 * `fields_contains`
 
+#### Exact
 
 * `loggingpolicy_exact`
 * `title_exact`
@@ -185,7 +191,7 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 }
 ```
 
-### ATC Logging Policy yaml file
+### ATC Enrichment yaml file
 
 ```yaml
 title: Enrichment #0002
@@ -206,9 +212,9 @@ author: atc-project
 config: |
   Here is the config example:
 
-  ```
+  ``
   code
-  ```
+  ``
 
 ```
 
@@ -230,12 +236,15 @@ r = requests.post(
 
 There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
 
+#### Contains
+
 * `title_contains`
 * `data_needed_contains`
 * `data_to_enrich_contains`
 * `requirements_contains`
 * `new_fields_contains`
 
+#### Exact
 
 * `title_exact`
 * `data_needed_exact`
@@ -263,5 +272,8 @@ If you want to set up environment for development purposes you should
 
 Your database would be availible on 5432 port you should apply migrations and start developing ATC API. 
 
+---
 
+## Known issues/things
 
+- [ ] `author` field is not parsed/handled in every entity
