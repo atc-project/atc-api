@@ -528,7 +528,7 @@ class DetectionRule(models.Model):
         verbose_name="Severity Level"
     )
 
-    dev_status = models.TextField(
+    status = models.TextField(
         verbose_name="Development Status"
     )
 
@@ -540,11 +540,12 @@ class DetectionRule(models.Model):
 
     author = models.CharField(
         max_length=255,
-        verbose_name="Author"
+        verbose_name="Author",
+        blank=True, null=True
     )
 
     raw_rule = models.TextField(
-        verbose_name="Raw rule (JSON)"
+        verbose_name="Raw rule (JSON as a string)"
     )
 
     def __str__(self):

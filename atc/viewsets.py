@@ -1,6 +1,6 @@
 import atc.models as models
 import atc.serializers as serializers
-
+import json
 from rest_framework import viewsets, permissions
 from django_filters import rest_framework as filters
 # from rest_framework.decorators import action
@@ -480,7 +480,10 @@ class DetectionRuleViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        title = data['title']
+        try:
+            title = data['raw_rule'][0]['title']
+        except IndexError:
+            raise Exception("Could not find a title in given DR rule")
         if self.queryset.filter(title=title):
             obj = self.queryset.filter(title=title).first()
             self.kwargs['pk'] = obj.id
