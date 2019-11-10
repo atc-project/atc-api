@@ -507,10 +507,6 @@ class DetectionRule(models.Model):
         verbose_name = "Detection Rule"
         verbose_name_plural = "Detection Rules"
 
-    data_needed = models.ManyToManyField(
-        DataNeeded, blank=True
-    )
-
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
@@ -518,6 +514,37 @@ class DetectionRule(models.Model):
 
     description = models.TextField(
         verbose_name="Description"
+    )
+
+    tag = models.ManyToManyField(
+        Tag, blank=True
+    )
+
+    data_needed = models.ManyToManyField(
+        DataNeeded, blank=True
+    )
+
+    severity = models.TextField(
+        verbose_name="Severity Level"
+    )
+
+    dev_status = models.TextField(
+        verbose_name="Development Status"
+    )
+
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
+        blank=True,
+    )
+
+    author = models.CharField(
+        max_length=255,
+        verbose_name="Author"
+    )
+
+    raw_rule = models.TextField(
+        verbose_name="Raw rule (JSON)"
     )
 
     def __str__(self):
