@@ -36,6 +36,8 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
     ########################
 
     for item in rule:
+        if not item.get("detection"):
+            continue
         temp_field_list = []
         for condition in item.get("detection").keys():
             if condition == "condition":
@@ -58,7 +60,6 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
                     "eventid",
                     "eventids"
                 ]:
-                    print(type(item["detection"][condition][fieldname]))
                     # if this is a list of values..
                     if isinstance(item["detection"][condition][fieldname],
                                   list):
@@ -92,20 +93,18 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
     # Find according DNs   #
     ########################
 
-    print(event_ids)
-    print(field_list)
-
     # find by EventID (easy)
     for event_id in event_ids:
         try:
-            data_needed = DataNeeded.objects.get(eventID=event_id)
+            data_needed_list = DataNeeded.objects.filter(eventID=event_id)
         except ObjectDoesNotExist:
-            data_needed = None
+            data_needed_list = None
 
-        if data_needed:
-            # we do not have to care about duplicates
-            # django will handle that
-            detection_rule.data_needed.add(data_needed.id)
+        if data_needed_list:
+            for data_needed in data_needed_list:
+                # we do not have to care about duplicates
+                # django will handle that
+                detection_rule.data_needed.add(data_needed.id)
 
     # find by set of fields (all fields have to match)
     for field_set in field_list:
@@ -118,7 +117,7 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
             except ObjectDoesNotExist:
                 pass
 
-        # find all DNs with fields in the list
+        # find all DNs with at least one field in the provided list
         # filter to leave only those with all the fields matched
         results = DataNeeded.objects.filter(
             fields__in=translated_list).annotate(

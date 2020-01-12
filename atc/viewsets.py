@@ -340,6 +340,10 @@ class DataNeededFilter(filters.FilterSet):
         field_name='fields', lookup_expr='name__iexact',
         distinct=True
     )
+    eventid_exact = filters.CharFilter(
+        field_name='eventID', lookup_expr='id__iexact',
+        distinct=True
+    )
 
     class Meta:
         model = models.DataNeeded
@@ -482,7 +486,7 @@ class DetectionRuleViewSet(viewsets.ModelViewSet):
         data = request.data
         try:
             title = data['raw_rule'][0]['title']
-        except IndexError:
+        except (IndexError, KeyError):
             raise Exception("Could not find a title in given DR rule")
         if self.queryset.filter(title=title):
             obj = self.queryset.filter(title=title).first()
