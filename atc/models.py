@@ -259,6 +259,11 @@ class DataNeeded(models.Model):
         related_name="fields"
     )
 
+    eventID = models.ManyToManyField(
+        EventID,
+        verbose_name="Event ID(s)",
+    )
+
     sample = models.TextField(
         verbose_name="Sample"
     )

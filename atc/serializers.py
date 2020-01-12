@@ -1,7 +1,7 @@
 from rest_framework import serializers
 import atc.models as models
 # from pprint import pprint
-import atc.atc_dr_utils
+from atc.atc_dr_utils import fill_DN
 from json import dumps as json_dumps
 
 
@@ -448,6 +448,9 @@ class DataNeededSerializer(serializers.ModelSerializer):
         many=True, allow_null=True, required=False)
     fields = LogFieldSerializerNested(
         many=True, allow_null=True, required=False)
+    eventID = EventIDSerializerNested(
+        many=True, allow_null=True, required=False
+    )
 
     class Meta:
         model = models.DataNeeded
@@ -498,6 +501,17 @@ class DataNeededSerializer(serializers.ModelSerializer):
             dataneeded.fields.set([])
         if dataneeded.loggingpolicy:
             dataneeded.loggingpolicy.set([])
+        if dataneeded.eventID:
+            dataneeded.eventID.set([])
+
+        # special case (EventID from a title)
+        try:
+            eid = int(validated_data['title'].split("_")[2])
+            obj = models.EventID.objects.get_or_create(id=eid)[0]
+            dataneeded.eventID.add(obj.id)
+        except ValueError:
+            # No EventID in the title
+            pass
 
         for item in references:
             obj = models.References.objects.get_or_create(url=item['url'])[0]
@@ -785,15 +799,18 @@ class DetectionRuleSerializer(serializers.ModelSerializer):
         if detection_rule.references:
             detection_rule.references.set([])
 
-        for item in references:
-            obj = models.References.objects.get_or_create(url=item)
+        for url in references:
+            obj = models.References.objects.get_or_create(url=url)
             detection_rule.references.add(obj[0])
 
-        for item in tags:
-            obj = models.Tag.objects.get_or_create(name=item)
+        for name in tags:
+            obj = models.Tag.objects.get_or_create(name=name)
             detection_rule.tag.add(obj[0])
 
         detection_rule.save()
+
+        fill_DN(detection_rule)
+
         return detection_rule
 
     def update(self, instance, validated_data):
