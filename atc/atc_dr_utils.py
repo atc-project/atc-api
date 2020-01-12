@@ -1,6 +1,7 @@
-from atc.models import DetectionRule, DataNeeded
+from atc.models import DetectionRule, DataNeeded, LogField
 from yaml import load_all, FullLoader
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 
 mitre_tactics_list = [
     'initial_access',
@@ -25,7 +26,9 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
     rule = load_all(detection_rule.raw_rule, Loader=FullLoader)
     [rule] = [x for x in rule]
 
+    # contains a list of lists of fields
     field_list = []
+    # contains a list of EventIDs (integeres)
     event_ids = []
 
     ########################
@@ -33,6 +36,7 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
     ########################
 
     for item in rule:
+        temp_field_list = []
         for condition in item.get("detection").keys():
             if condition == "condition":
                 # this does not contain any fields from logs so skip
@@ -45,7 +49,7 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
 
             for fieldname in item["detection"][condition].keys():
                 # add a fieldname to field_list
-                field_list.append(fieldname)
+                temp_field_list.append(fieldname)
 
                 # check if maybe the field holds event IDs
                 if fieldname.lower() in [
@@ -82,6 +86,7 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
                             )
                         except ValueError:
                             pass
+        field_list.append(temp_field_list)
 
     ########################
     # Find according DNs   #
@@ -101,3 +106,26 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
             # we do not have to care about duplicates
             # django will handle that
             detection_rule.data_needed.add(data_needed.id)
+
+    # find by set of fields (all fields have to match)
+    for field_set in field_list:
+        translated_list = []
+
+        # translate field names to IDs
+        for field in field_set:
+            try:
+                translated_list.append(LogField.objects.get(name=field))
+            except ObjectDoesNotExist:
+                pass
+
+        # find all DNs with fields in the list
+        # filter to leave only those with all the fields matched
+        results = DataNeeded.objects.filter(
+            fields__in=translated_list).annotate(
+            num_fields=Count('fields')).filter(
+            num_fields=len(translated_list)
+        )
+
+        if results:
+            for value in results:
+                detection_rule.data_needed.add(value.id)
