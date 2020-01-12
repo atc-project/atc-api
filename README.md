@@ -9,11 +9,11 @@
 | Enrichments | Fully supported |
 | Response Actions | **NOT** supported |
 | Response Playbooks | **NOT** supported |
-| Detection Rules | **NOT** supported |
+| Detection Rules | Partially supported (view, insert) |
 
 
 * Fully supported - User can view, insert, update and filter the data
-* Partially supported - User can only view data
+* Partially supported - User can only either view/insert/filter data
 
 # Entities
 
