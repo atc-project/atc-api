@@ -31,11 +31,31 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
     # contains a list of EventIDs (integeres)
     event_ids = []
 
-    ########################
-    # Fill two above lists #
-    ########################
+    logsources = []
+
+    ##########################
+    # Fill three above lists #
+    ##########################
 
     for item in rule:
+        if item.get("logsource"):
+            logsrc = item.get("logsource")
+            lg_dict = {}
+            if logsrc.get("product"):
+                lg_dict["product"] = logsrc.get("product")
+            if logsrc.get("service"):
+                lg_dict["service"] = logsrc.get("service")
+            if logsrc.get("category"):
+                lg_dict["category"] = logsrc.get("category")
+                if logsrc.get("category") == "process_creation":
+                    if 1 not in event_ids:
+                        event_ids.append(1)
+                    if 4688 not in event_ids:
+                        event_ids.append(4688)
+            if lg_dict:
+                logsources.append(lg_dict)
+                del lg_dict
+
         if not item.get("detection"):
             continue
         temp_field_list = []
@@ -88,23 +108,35 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
                         except ValueError:
                             pass
         field_list.append(temp_field_list)
-
+    if "JRAT" in detection_rule.title:
+        print(field_list)
+        print(event_ids)
+        print(logsources)
     ########################
     # Find according DNs   #
     ########################
 
     # find by EventID (easy)
-    for event_id in event_ids:
-        try:
-            data_needed_list = DataNeeded.objects.filter(eventID=event_id)
-        except ObjectDoesNotExist:
-            data_needed_list = None
+    for logsrc in logsources:
+        for event_id in event_ids:
+            if not logsrc.get("product"):
+                break
+            try:
+                # icontains => case-insensitive contains
+                data_needed_list = DataNeeded.objects.filter(
+                    eventID=event_id,
+                    platform__name__icontains=logsrc.get("product"),
+                    provider__name__icontains=logsrc.get("service"),
+                )
+            except ObjectDoesNotExist:
+                data_needed_list = None
 
-        if data_needed_list:
-            for data_needed in data_needed_list:
-                # we do not have to care about duplicates
-                # django will handle that
-                detection_rule.data_needed.add(data_needed.id)
+            if data_needed_list:
+                for data_needed in data_needed_list:
+
+                    # we do not have to care about duplicates
+                    # django will handle that
+                    detection_rule.data_needed.add(data_needed.id)
 
     # find by set of fields (all fields have to match)
     for field_set in field_list:
@@ -126,5 +158,51 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
         )
 
         if results:
-            for value in results:
-                detection_rule.data_needed.add(value.id)
+            # result is a DataNeeded object
+            for result in results:
+                #
+                # https://youtu.be/0p_1QSUsbsM
+                #
+
+                for logsrc in logsources:
+
+                    if result.eventID.values() \
+                            and result.eventID.values(
+                    )[0]["id"] not in event_ids:
+                        continue
+
+                    # Init values
+                    product_check = False
+                    service_check = False
+
+                    # If there is a product defined in DR logsource
+                    # and it matches DN platform..
+                    if logsrc.get("product") \
+                            and logsrc.get(
+                                "product") in str(result.platform).lower():
+                        product_check = True
+
+                    # If the product check was passed
+                    # and DR logsource had service defined
+                    # and it matches DN service..
+                    if product_check and logsrc.get("service") \
+                            and logsrc.get(
+                                "service") in str(result.provider).lower():
+                        service_check = True
+
+                    # This is dirty workaround
+                    # There will be FPs for sure
+                    #
+                    # If service_check already not passed
+                    # and DR logsource has category
+                    # and category is process_creation
+                    # set service_check to True
+                    if not service_check and logsrc.get("category") \
+                            and logsrc.get(
+                                "category").lower() in result.title.lower():
+                        service_check = True
+
+                    # If both checks are passed, add DN and break the loop
+                    if service_check and product_check:
+                        detection_rule.data_needed.add(result.id)
+                        break

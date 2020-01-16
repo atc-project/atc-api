@@ -477,10 +477,24 @@ class ResponsePlaybookViewSet(viewsets.ModelViewSet):
         )
 
 
+class DetectionRuleFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    dataneeded_isnull = filters.BooleanFilter(
+        field_name='data_needed', lookup_expr='isnull',
+        distinct=True
+    )
+
+
 class DetectionRuleViewSet(viewsets.ModelViewSet):
     queryset = models.DetectionRule.objects.all()
     serializer_class = serializers.DetectionRuleSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = DetectionRuleFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
