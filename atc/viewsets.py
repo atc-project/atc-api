@@ -489,6 +489,11 @@ class DetectionRuleFilter(filters.FilterSet):
         distinct=True
     )
 
+    data_needed_contains = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__icontains',
+        distinct=True
+    )
+
     tag_contains = filters.CharFilter(
         field_name='tag', lookup_expr='name__icontains',
         distinct=True
@@ -519,6 +524,11 @@ class DetectionRuleFilter(filters.FilterSet):
         distinct=True
     )
 
+    data_needed_exact = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__iexact',
+        distinct=True
+    )
+
     tag_exact = filters.CharFilter(
         field_name='tag', lookup_expr='name__iexact',
         distinct=True
@@ -539,12 +549,12 @@ class DetectionRuleFilter(filters.FilterSet):
         distinct=True
     )
 
-    dataneeded_isnull = filters.BooleanFilter(
+    data_needed_isnull = filters.BooleanFilter(
         field_name='data_needed', lookup_expr='isnull',
         distinct=True, label="Data Needed is NULL"
     )
 
-    rawrule_contains = filters.CharFilter(
+    raw_rule_contains = filters.CharFilter(
         field_name='raw_rule', lookup_expr='icontains',
         distinct=True
     )
