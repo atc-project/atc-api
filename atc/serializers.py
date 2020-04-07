@@ -775,6 +775,8 @@ class DetectionRuleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Description is missing")
 
         severity = raw_rule[0].get('severity', 'unknown')
+        if severity == 'unknown':
+            severity = raw_rule[0].get('level', 'unknown')
         dev_status = raw_rule[0].get('status', 'unknown')
 
         if not instance:
@@ -790,7 +792,7 @@ class DetectionRuleSerializer(serializers.ModelSerializer):
         references = raw_rule[0].get('references', [])
 
         detection_rule.severity = severity
-        detection_rule.dev_status = dev_status
+        detection_rule.status = dev_status
         detection_rule.author = raw_rule[0].get('author', "unknown")
         detection_rule.raw_rule = json_dumps(raw_rule)
 

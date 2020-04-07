@@ -484,8 +484,68 @@ class DetectionRuleFilter(filters.FilterSet):
         distinct=True
     )
 
+    description_contains = filters.CharFilter(
+        field_name='description', lookup_expr='icontains',
+        distinct=True
+    )
+
+    tag_contains = filters.CharFilter(
+        field_name='tag', lookup_expr='name__icontains',
+        distinct=True
+    )
+
+    severity_contains = filters.CharFilter(
+        field_name='severity', lookup_expr='icontains',
+        distinct=True
+    )
+
+    status_contains = filters.CharFilter(
+        field_name='status', lookup_expr='icontains',
+        distinct=True
+    )
+
+    author_contains = filters.CharFilter(
+        field_name='author', lookup_expr='icontains',
+        distinct=True
+    )
+
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    description_exact = filters.CharFilter(
+        field_name='description', lookup_expr='iexact',
+        distinct=True
+    )
+
+    tag_exact = filters.CharFilter(
+        field_name='tag', lookup_expr='name__iexact',
+        distinct=True
+    )
+
+    severity_exact = filters.CharFilter(
+        field_name='severity', lookup_expr='iexact',
+        distinct=True
+    )
+
+    status_exact = filters.CharFilter(
+        field_name='status', lookup_expr='iexact',
+        distinct=True
+    )
+
+    author_exact = filters.CharFilter(
+        field_name='author', lookup_expr='iexact',
+        distinct=True
+    )
+
     dataneeded_isnull = filters.BooleanFilter(
         field_name='data_needed', lookup_expr='isnull',
+        distinct=True, label="Data Needed is NULL"
+    )
+
+    rawrule_contains = filters.CharFilter(
+        field_name='raw_rule', lookup_expr='icontains',
         distinct=True
     )
 

@@ -20,6 +20,19 @@ mitre_tactics_list = [
 
 mitre_techniques_regex = 'attack\.t\d{4}'
 
+process_creation_config = [
+    {
+        "EventID": 4688,
+        "product": "windows",
+        "service": "security"
+    },
+    {
+        "EventID": 10,
+        "product": "windows",
+        "service": "sysmon"
+    },
+]
+
 
 def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
 
@@ -108,10 +121,10 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
                         except ValueError:
                             pass
         field_list.append(temp_field_list)
-    if "JRAT" in detection_rule.title:
-        print(field_list)
-        print(event_ids)
-        print(logsources)
+    # if "JRAT" in detection_rule.title:
+    #     print(field_list)
+    #     print(event_ids)
+    #     print(logsources)
     ########################
     # Find according DNs   #
     ########################
@@ -121,15 +134,30 @@ def fill_DN(detection_rule: DetectionRule) -> DetectionRule:
         for event_id in event_ids:
             if not logsrc.get("product"):
                 break
-            try:
-                # icontains => case-insensitive contains
-                data_needed_list = DataNeeded.objects.filter(
-                    eventID=event_id,
-                    platform__name__icontains=logsrc.get("product"),
-                    provider__name__icontains=logsrc.get("service"),
-                )
-            except ObjectDoesNotExist:
-                data_needed_list = None
+            if logsrc.get("category"):
+                for pc_lgsrc in process_creation_config:
+                    try:
+                        # icontains => case-insensitive contains
+                        data_needed_list = DataNeeded.objects.filter(
+                            eventID=pc_lgsrc.get("EventID"),
+                            platform__name__icontains=pc_lgsrc.get("product"),
+                            provider__name__icontains=pc_lgsrc.get("service"),
+                        )
+                    except ObjectDoesNotExist:
+                        data_needed_list = None
+            else:
+                try:
+                    # icontains => case-insensitive contains
+                    data_needed_list = DataNeeded.objects.filter(
+                        eventID=event_id,
+                        platform__name__icontains=logsrc.get("product"),
+                        provider__name__icontains=logsrc.get("service"),
+                    )
+                except ObjectDoesNotExist:
+                    data_needed_list = None
+                except ValueError:
+                    # Probably missing service field
+                    continue
 
             if data_needed_list:
                 for data_needed in data_needed_list:
