@@ -347,11 +347,10 @@ class ResponseAction(models.Model):
         verbose_name="Description"
     )
 
-    references = models.ForeignKey(
+    references = models.ManyToManyField(
         References,
         verbose_name="References(s)",
-        on_delete=models.SET_NULL,
-        null=True, blank=True,
+        blank=True,
         related_name="references"
     )
 
@@ -373,11 +372,10 @@ class ResponseAction(models.Model):
         verbose_name="Creation date"
     )
 
-    linked_ra = models.ForeignKey(
+    linked_ra = models.ManyToManyField(
         "self",
         verbose_name="Linked Response Action(s)",
-        on_delete=models.SET_NULL,
-        null=True, blank=True,
+        blank=True,
     )
 
     workflow = models.TextField(

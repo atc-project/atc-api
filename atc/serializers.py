@@ -3,6 +3,7 @@ import atc.models as models
 # from pprint import pprint
 from atc.atc_dr_utils import fill_DN
 from json import dumps as json_dumps
+from datetime import datetime
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -678,25 +679,109 @@ class EnrichmentSerializer(serializers.ModelSerializer):
         return self.create(validated_data, instance=instance)
 
 
+class ResponseActionListSerializer(serializers.ModelSerializer):
+    """
+    Dirty solution as I don't know how to point to "self" in serializer
+    """
+
+    title = serializers.CharField()
+
+    class Meta:
+        model = models.ResponseAction
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return {"title": data}
+
+
 class ResponseActionSerializer(serializers.ModelSerializer):
 
     # Translate IDs to corresponding field values
-    references = serializers.CharField(
-        source='references.name',
-        allow_null=True, allow_blank=True
+    references = ReferencesSerializerNested(
+        allow_null=True, required=False, many=True
     )
     stage = serializers.CharField(
         source='stage.name',
         allow_null=True, allow_blank=True
     )
-    linked_ra = serializers.CharField(
-        source='linked_ra.title',
+    linked_ra = ResponseActionListSerializer(
+        allow_null=True, required=False, many=True
+    )
+    creation_date = serializers.CharField(
         allow_null=True, allow_blank=True
     )
 
     class Meta:
         model = models.ResponseAction
         fields = '__all__'
+
+    def create(self, validated_data, instance=None):
+
+        if 'references' in validated_data:
+            references = validated_data.pop('references')
+        else:
+            references = []
+
+        if 'stage' in validated_data:
+            stage = validated_data.pop('stage')
+        else:
+            stage = 'unknown'
+
+        if 'linked_ra' in validated_data:
+            linked_ra = validated_data.pop('linked_ra')
+        else:
+            linked_ra = []
+
+        if not instance:
+            raction = models.ResponseAction.objects.get_or_create(
+                title=validated_data['title']
+            )[0]
+        else:
+            raction = instance
+
+        if raction.references:
+            raction.references.set([])
+
+        if raction.linked_ra:
+            raction.linked_ra.set([])
+
+        obj = models.Stage.objects.get_or_create(name=stage)[0]
+        raction.stage = obj
+
+        raction.title = validated_data.get("title")
+        raction.description = validated_data.get("description")
+        raction.author = validated_data.get("author")
+        raction.workflow = validated_data.get("workflow")
+
+        if validated_data.get("creation_date"):
+            str_time = validated_data.get("creation_date")
+            try:
+                raction.creation_date = datetime.strptime(str_time, "%d.%m.%Y")
+            except ValueError:
+                # Could not parse, place default value
+                pass
+
+        for item in references:
+            obj = models.References.objects.get_or_create(url=item['url'])
+            raction.references.add(obj[0])
+
+        for item in linked_ra:
+            try:
+                obj = models.ResponseAction.objects.get(title=item['title'])
+            except:
+                raise serializers.ValidationError(
+                    f"Response Action {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
+            raction.linked_ra.add(obj)
+        raction.save()
+        return raction
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data, instance=instance)
 
 
 class ResponsePlaybookSerializer(serializers.ModelSerializer):
