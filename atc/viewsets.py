@@ -1,6 +1,6 @@
 import atc.models as models
 import atc.serializers as serializers
-
+import json
 from rest_framework import viewsets, permissions
 from django_filters import rest_framework as filters
 # from rest_framework.decorators import action
@@ -340,6 +340,10 @@ class DataNeededFilter(filters.FilterSet):
         field_name='fields', lookup_expr='name__iexact',
         distinct=True
     )
+    eventid_exact = filters.CharFilter(
+        field_name='eventID', lookup_expr='id__iexact',
+        distinct=True
+    )
 
     class Meta:
         model = models.DataNeeded
@@ -473,14 +477,101 @@ class ResponsePlaybookViewSet(viewsets.ModelViewSet):
         )
 
 
+class DetectionRuleFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    description_contains = filters.CharFilter(
+        field_name='description', lookup_expr='icontains',
+        distinct=True
+    )
+
+    data_needed_contains = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__icontains',
+        distinct=True
+    )
+
+    tag_contains = filters.CharFilter(
+        field_name='tag', lookup_expr='name__icontains',
+        distinct=True
+    )
+
+    severity_contains = filters.CharFilter(
+        field_name='severity', lookup_expr='icontains',
+        distinct=True
+    )
+
+    status_contains = filters.CharFilter(
+        field_name='status', lookup_expr='icontains',
+        distinct=True
+    )
+
+    author_contains = filters.CharFilter(
+        field_name='author', lookup_expr='icontains',
+        distinct=True
+    )
+
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    description_exact = filters.CharFilter(
+        field_name='description', lookup_expr='iexact',
+        distinct=True
+    )
+
+    data_needed_exact = filters.CharFilter(
+        field_name='data_needed', lookup_expr='title__iexact',
+        distinct=True
+    )
+
+    tag_exact = filters.CharFilter(
+        field_name='tag', lookup_expr='name__iexact',
+        distinct=True
+    )
+
+    severity_exact = filters.CharFilter(
+        field_name='severity', lookup_expr='iexact',
+        distinct=True
+    )
+
+    status_exact = filters.CharFilter(
+        field_name='status', lookup_expr='iexact',
+        distinct=True
+    )
+
+    author_exact = filters.CharFilter(
+        field_name='author', lookup_expr='iexact',
+        distinct=True
+    )
+
+    data_needed_isnull = filters.BooleanFilter(
+        field_name='data_needed', lookup_expr='isnull',
+        distinct=True, label="Data Needed is NULL"
+    )
+
+    raw_rule_contains = filters.CharFilter(
+        field_name='raw_rule', lookup_expr='icontains',
+        distinct=True
+    )
+
+
 class DetectionRuleViewSet(viewsets.ModelViewSet):
     queryset = models.DetectionRule.objects.all()
     serializer_class = serializers.DetectionRuleSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = DetectionRuleFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        title = data['title']
+        try:
+            title = data['raw_rule'][0]['title']
+        except (IndexError, KeyError):
+            raise Exception("Could not find a title in given DR rule")
         if self.queryset.filter(title=title):
             obj = self.queryset.filter(title=title).first()
             self.kwargs['pk'] = obj.id

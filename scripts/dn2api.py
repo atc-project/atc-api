@@ -19,7 +19,7 @@ for file in filenames:
         json=dn
     )
 
-    if r.status_code != 200:
+    if r.status_code // 100 != 2:
         pprint(file)
         pprint(r.text)
 

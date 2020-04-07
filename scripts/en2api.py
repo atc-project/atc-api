@@ -17,7 +17,8 @@ r = requests.post(
     json=lp
 )
 
-pprint(r.text)
+if r.status_code // 100 != 2:
+    pprint(r.text)
 
 path_to_lp = (
     "/home/ubuntu/projects/atc-api/tests/files/"
@@ -32,4 +33,5 @@ r = requests.post(
     json=lp
 )
 
-pprint(r.text)
+if r.status_code // 100 != 2:
+    pprint(r.text)

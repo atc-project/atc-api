@@ -169,13 +169,12 @@ class LoggingPolicy(models.Model):
     eventID = models.ManyToManyField(
         EventID,
         verbose_name="Event ID(s)",
-        null=True
     )
 
     references = models.ManyToManyField(
         References,
         verbose_name="References(s)",
-        null=True, blank=True
+        blank=True
     )
 
     configuration = models.TextField(
@@ -204,14 +203,14 @@ class DataNeeded(models.Model):
     loggingpolicy = models.ManyToManyField(
         LoggingPolicy,
         verbose_name="Logging Policy(ies)",
-        null=True, blank=True,
+        blank=True,
         related_name="loggin_policy"
     )
 
     references = models.ManyToManyField(
         References,
         verbose_name="References(s)",
-        null=True, blank=True,
+        blank=True,
     )
 
     category = models.ForeignKey(
@@ -257,8 +256,12 @@ class DataNeeded(models.Model):
     fields = models.ManyToManyField(
         LogField,
         verbose_name="Log Field(s)",
-        null=True,
         related_name="fields"
+    )
+
+    eventID = models.ManyToManyField(
+        EventID,
+        verbose_name="Event ID(s)",
     )
 
     sample = models.TextField(
@@ -287,33 +290,32 @@ class Enrichment(models.Model):
     data_needed = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data Needed",
-        null=True,
         related_name='data_needed'
     )
 
     data_to_enrich = models.ManyToManyField(
         DataNeeded,
         verbose_name="Data to Enrich",
-        null=True, blank=True,
+        blank=True,
         related_name='data_to_enrich'
     )
 
     requirements = models.ManyToManyField(
         "self",
         verbose_name="Requirement(s)",
-        null=True, blank=True,
+        blank=True,
     )
 
     references = models.ManyToManyField(
         References,
         verbose_name="References(s)",
-        null=True, blank=True,
+        blank=True,
     )
 
     new_fields = models.ManyToManyField(
         LogField,
         verbose_name="New field(s)",
-        null=True, blank=True,
+        blank=True,
         related_name="new_field"
     )
 
@@ -510,9 +512,6 @@ class DetectionRule(models.Model):
         verbose_name = "Detection Rule"
         verbose_name_plural = "Detection Rules"
 
-    data_needed = models.ManyToManyField(
-        DataNeeded, null=True, blank=True
-    )
     title = models.CharField(
         max_length=255,
         verbose_name="Title"
@@ -520,6 +519,38 @@ class DetectionRule(models.Model):
 
     description = models.TextField(
         verbose_name="Description"
+    )
+
+    tag = models.ManyToManyField(
+        Tag, blank=True
+    )
+
+    data_needed = models.ManyToManyField(
+        DataNeeded, blank=True
+    )
+
+    severity = models.TextField(
+        verbose_name="Severity Level"
+    )
+
+    status = models.TextField(
+        verbose_name="Development Status"
+    )
+
+    references = models.ManyToManyField(
+        References,
+        verbose_name="References(s)",
+        blank=True,
+    )
+
+    author = models.CharField(
+        max_length=255,
+        verbose_name="Author",
+        blank=True, null=True
+    )
+
+    raw_rule = models.TextField(
+        verbose_name="Raw rule (JSON as a string)"
     )
 
     def __str__(self):

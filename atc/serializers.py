@@ -1,6 +1,8 @@
 from rest_framework import serializers
 import atc.models as models
 # from pprint import pprint
+from atc.atc_dr_utils import fill_DN
+from json import dumps as json_dumps
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -300,7 +302,7 @@ class EventIDSerializerNested(serializers.ModelSerializer):
         return {"id": data}
 
 
-class TagSerializerNested(serializers.CharField):
+class TagSerializerNested(serializers.ModelSerializer):
 
     name = serializers.CharField()
 
@@ -309,7 +311,7 @@ class TagSerializerNested(serializers.CharField):
         fields = '__all__'
 
     def create(self, validated_data):
-        tag = models.LogField.objects.get_or_create(
+        tag = models.Tag.objects.get_or_create(
             name=validated_data.get('name')
         )
         return tag
@@ -318,7 +320,7 @@ class TagSerializerNested(serializers.CharField):
         return self.create(validated_data)
 
     def to_representation(self, value):
-        return value
+        return value.name
 
     def to_internal_value(self, data):
         return data
@@ -446,6 +448,9 @@ class DataNeededSerializer(serializers.ModelSerializer):
         many=True, allow_null=True, required=False)
     fields = LogFieldSerializerNested(
         many=True, allow_null=True, required=False)
+    eventID = EventIDSerializerNested(
+        many=True, allow_null=True, required=False
+    )
 
     class Meta:
         model = models.DataNeeded
@@ -496,6 +501,17 @@ class DataNeededSerializer(serializers.ModelSerializer):
             dataneeded.fields.set([])
         if dataneeded.loggingpolicy:
             dataneeded.loggingpolicy.set([])
+        if dataneeded.eventID:
+            dataneeded.eventID.set([])
+
+        # special case (EventID from a title)
+        try:
+            eid = int(validated_data['title'].split("_")[2])
+            obj = models.EventID.objects.get_or_create(id=eid)[0]
+            dataneeded.eventID.add(obj.id)
+        except ValueError:
+            # No EventID in the title
+            pass
 
         for item in references:
             obj = models.References.objects.get_or_create(url=item['url'])[0]
@@ -717,26 +733,87 @@ class ResponsePlaybookSerializer(serializers.ModelSerializer):
 
 
 class DetectionRuleSerializer(serializers.ModelSerializer):
-    data_needed_names = serializers.ListField(write_only=True)
+
+    raw_rule = serializers.JSONField()
+    tag = TagSerializerNested(
+        allow_null=True, required=False, many=True
+    )
+    references = ReferencesSerializerNested(
+        allow_null=True, required=False, many=True
+    )
+    data_needed = DataNeededViewSerializer(
+        allow_null=True, required=False, many=True
+    )
+    description = serializers.CharField(
+        allow_null=True, required=False
+    )
+    severity = serializers.CharField(
+        allow_null=True, required=False
+    )
+    status = serializers.CharField(
+        allow_null=True, required=False
+    )
+    title = serializers.CharField(
+        allow_null=True, required=False
+    )
 
     class Meta:
         model = models.DetectionRule
         fields = '__all__'
-        depth = 1
 
-    def create(self, validated_data):
-        data_needed_names = validated_data['data_needed_names']
-        dn_list = []
-        for name in data_needed_names:
-            queryset = models.DataNeeded.objects.filter(title=name)
-            if len(queryset) > 0:
-                dn_list.append(queryset.first())
+    def create(self, validated_data, instance=None):
+        raw_rule = validated_data.pop('raw_rule')
 
-            dr = models.DetectionRule.objects.create(
-                title=validated_data['title'],
-                description=validated_data['description']
-            )
-            for dn in dn_list:
-                dr.data_needed.add(dn)
-            dr.save()
-        return dr
+        try:
+            title = raw_rule[0]['title']
+        except:
+            raise serializers.ValidationError("Title is missing")
+
+        try:
+            description = raw_rule[0]['description']
+        except:
+            raise serializers.ValidationError("Description is missing")
+
+        severity = raw_rule[0].get('severity', 'unknown')
+        if severity == 'unknown':
+            severity = raw_rule[0].get('level', 'unknown')
+        dev_status = raw_rule[0].get('status', 'unknown')
+
+        if not instance:
+            detection_rule = models.DetectionRule.objects.get_or_create(
+                title=title
+            )[0]
+        else:
+            detection_rule = instance
+
+        detection_rule.description = description
+
+        tags = raw_rule[0].get('tags', [])
+        references = raw_rule[0].get('references', [])
+
+        detection_rule.severity = severity
+        detection_rule.status = dev_status
+        detection_rule.author = raw_rule[0].get('author', "unknown")
+        detection_rule.raw_rule = json_dumps(raw_rule)
+
+        if detection_rule.tag:
+            detection_rule.tag.set([])
+        if detection_rule.references:
+            detection_rule.references.set([])
+
+        for url in references:
+            obj = models.References.objects.get_or_create(url=url)
+            detection_rule.references.add(obj[0])
+
+        for name in tags:
+            obj = models.Tag.objects.get_or_create(name=name)
+            detection_rule.tag.add(obj[0])
+
+        detection_rule.save()
+
+        fill_DN(detection_rule)
+
+        return detection_rule
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data, instance=instance)

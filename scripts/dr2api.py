@@ -1,25 +1,30 @@
+#!/usr/bin/env python3
+
 import requests
 import yaml
-from atcutils import ATCutils
-import os
+from pprint import pprint
+from os import walk
 
-def export_dr(path_to_dr):
+dr_dir = (
+    '/home/ubuntu/projects/atomic-threat-coverage/detection_rules/sigma/'
+    'rules'
+)
 
-    dr = ATCutils.read_yaml_file(path_to_dr)
-    dn = ATCutils.main_dn_calculatoin_func(path_to_dr)
-    dr['data_needed_names'] = dn
-    r = requests.post('http://127.0.0.1:8000/api/v0/atc/detectionrule/', json=dr)
-    print(r)
+for dirpath, _, filenames in walk(dr_dir):
 
+    for file in filenames:
+        if file[-3:] != "yml":
+            continue
 
+        with open(dirpath + "/" + file, 'r') as stream:
+            dr = [x for x in yaml.safe_load_all(stream)]
+            data = {'raw_rule': dr}
 
+        r = requests.post(
+            'http://127.0.0.1:8000/api/v1/atc/detectionrule/',
+            json=data
+        )
 
-
-
-if __name__=='__main__':
-    path = '../detection_rules/sigma/rules/apt/'
-    for file in os.listdir(path):
-        export_dr(f'{path}/{file}')
-
-
-
+        if r.status_code // 100 != 2:
+            # pprint(r.text)
+            pprint(file)

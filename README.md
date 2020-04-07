@@ -9,11 +9,11 @@
 | Enrichments | Fully supported |
 | Response Actions | **NOT** supported |
 | Response Playbooks | **NOT** supported |
-| Detection Rules | **NOT** supported |
+| Detection Rules | Fully supported |
 
 
 * Fully supported - User can view, insert, update and filter the data
-* Partially supported - User can only view data
+* Partially supported - User can only either view/insert/filter data
 
 # Entities
 
@@ -251,6 +251,105 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 * `data_to_enrich_exact`
 * `requirements_exact`
 * `new_fields_exact`
+
+# Detection Rule
+
+### JSON structure
+
+> There are many fields defined which API will accept but in the backend, they are not considered in any way. Use `raw_rule` only!
+
+```json
+{
+    "raw_rule": "${DR JSON as string}",
+    "tag": [],
+    "references": [],
+    "data_needed": [],
+    "description": "",
+    "severity": "",
+    "status": "",
+    "title": "",
+    "author": ""
+}
+```
+
+### ATC Detection Rule yaml file
+
+```yaml
+title: Executable in ADS
+status: experimental
+description: Detects the creation of an ADS data stream that contains an executable (non-empty imphash)
+references:
+    - https://twitter.com/0xrawsec/status/1002478725605273600?s=21
+tags:
+    - attack.defense_evasion
+    - attack.t1027
+    - attack.s0139
+author: Florian Roth, @0xrawsec
+date: 2018/06/03
+logsource:
+    product: windows
+    service: sysmon
+    definition: 'Requirements: Sysmon config with Imphash logging activated'
+detection:
+    selection:
+        EventID: 15
+    filter:
+        Imphash: '00000000000000000000000000000000'
+    condition: selection and not filter
+fields:
+    - TargetFilename
+    - Image
+falsepositives:
+    - unknown
+level: critical
+```
+
+### Python snippet for inserting data
+
+> Remember that you have to put detection rule as `raw_rule`!
+
+```python
+path_to_en = "DR.yml"
+
+with open(path_to_en, 'r') as stream:
+    dr = [x for x in yaml.safe_load_all(stream)]
+    data = {'raw_rule': dr}
+
+r = requests.post(
+    'http://127.0.0.1:8000/api/v1/atc/enrichment/',
+    json=data
+)
+```
+
+### Filters
+
+There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
+
+#### Contains
+
+* `title_contains`
+* `description_contains`
+* `data_needed_contains`
+* `tag_contains`
+* `severity_contains`
+* `status_contains`
+* `author_contains`
+* `raw_rule_contains`
+
+#### Exact
+
+* `title_exact`
+* `description_exact`
+* `data_needed_exact`
+* `tag_exact`
+* `severity_exact`
+* `status_exact`
+* `author_exact`
+
+#### Others
+
+* `data_needed_isnull` (which takes either `true` or `false`)
+
 
 ---
 
