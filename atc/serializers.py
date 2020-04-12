@@ -264,7 +264,7 @@ class StageSerializerNested(serializers.CharField):
         fields = '__all__'
 
     def create(self, validated_data):
-        stage = models.LogField.objects.get_or_create(
+        stage = models.Stage.objects.get_or_create(
             name=validated_data.get('name')
         )
         return stage
@@ -703,10 +703,7 @@ class ResponseActionSerializer(serializers.ModelSerializer):
     references = ReferencesSerializerNested(
         allow_null=True, required=False, many=True
     )
-    stage = serializers.CharField(
-        source='stage.name',
-        allow_null=True, allow_blank=True
-    )
+    stage = StageSerializerNested(source='stage.name')
     linked_ra = ResponseActionListSerializer(
         allow_null=True, required=False, many=True
     )
@@ -726,7 +723,7 @@ class ResponseActionSerializer(serializers.ModelSerializer):
             references = []
 
         if 'stage' in validated_data:
-            stage = validated_data.pop('stage')
+            stage = validated_data.pop('stage').get('name')
         else:
             stage = 'unknown'
 
