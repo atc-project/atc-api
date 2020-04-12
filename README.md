@@ -7,7 +7,7 @@
 | Logging Policy | Fully supported |
 | Data Needed | Fully supported |
 | Enrichments | Fully supported |
-| Response Actions | **NOT** supported |
+| Response Actions | Fully supported |
 | Response Playbooks | **NOT** supported |
 | Detection Rules | Fully supported |
 
