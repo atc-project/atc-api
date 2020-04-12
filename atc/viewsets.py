@@ -439,10 +439,63 @@ class EnrichmentViewSet(viewsets.ModelViewSet):
         )
 
 
+class ResponseActionFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    stage_contains = filters.CharFilter(
+        field_name='stage__name', lookup_expr='icontains',
+        distinct=True
+    )
+
+    linked_ra_contains = filters.CharFilter(
+        field_name='linked_ra__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    author_contains = filters.CharFilter(
+        field_name='author', lookup_expr='icontains',
+        distinct=True
+    )
+
+    description_contains = filters.CharFilter(
+        field_name='description', lookup_expr='icontains',
+        distinct=True
+    )
+
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    stage_exact = filters.CharFilter(
+        field_name='stage__name', lookup_expr='iexact',
+        distinct=True
+    )
+
+    author_exact = filters.CharFilter(
+        field_name='author', lookup_expr='iexact',
+        distinct=True
+    )
+
+    linked_ra_exact = filters.CharFilter(
+        field_name='linked_ra__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    class Meta:
+        model = models.ResponseAction
+        fields = []
+
+
 class ResponseActionViewSet(viewsets.ModelViewSet):
     queryset = models.ResponseAction.objects.all()
     serializer_class = serializers.ResponseActionSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = ResponseActionFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
