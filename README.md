@@ -309,21 +309,21 @@ level: critical
 > Remember that you have to put detection rule as `raw_rule`!
 
 ```python
-path_to_en = "DR.yml"
+path_to_dr = "DR0001.yml"
 
-with open(path_to_en, 'r') as stream:
+with open(path_to_dr, 'r') as stream:
     dr = [x for x in yaml.safe_load_all(stream)]
     data = {'raw_rule': dr}
 
 r = requests.post(
-    'http://127.0.0.1:8000/api/v1/atc/enrichment/',
+    'http://127.0.0.1:8000/api/v1/atc/detectionrule/',
     json=data
 )
 ```
 
 ### Filters
 
-There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
+There are three types of filters - `exact match`, `contains` and `isnull`. Here is the list of valid filters:
 
 #### Contains
 
@@ -350,6 +350,86 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 
 * `data_needed_isnull` (which takes either `true` or `false`)
 
+
+# Response Action
+
+### JSON structure
+
+> There are many fields defined which API will accept but in the backend, they are not considered in any way. Use `raw_rule` only!
+
+```json
+{
+    "references": ["https://www.lifewire.com/save-an-email-as-an-eml-file-in-gmail-1171956","https://eml.tooutlook.com/"],
+    "stage": "identification",
+    "linked_ra": [],
+    "creation_date": "31.01.2019",
+    "title": "RA_0001_identification_get_original_email",
+    "description": "Obtain original phishing email",
+    "author": "@atc_project",
+    "workflow": "Obtain original phishing email from on of the available/fastest options:\n\n- Email Team/Email server: if there is such option\n- Person who reported the attack (if it wasn't detected automatically or reported by victims)\n- Victims: if they were reporting the attack\n\nAsk for email in `.EML` format. Instructions: \n\n  1. Drug and drop email from Email client to Desktop\n  2. Send to IR specialists by <email>\n"
+}
+```
+
+### ATC Detection Rule yaml file
+
+```yaml
+title: RA_0001_identification_get_original_email
+stage: identification
+author: '@atc_project'
+creation_date: 31.01.2019
+references: 
+  - https://www.lifewire.com/save-an-email-as-an-eml-file-in-gmail-1171956
+  - https://eml.tooutlook.com/
+description: >
+  Obtain original phishing email
+workflow: |
+  Obtain original phishing email from on of the available/fastest options:
+
+  - Email Team/Email server: if there is such option
+  - Person who reported the attack (if it wasn't detected automatically or reported by victims)
+  - Victims: if they were reporting the attack
+
+  Ask for email in `.EML` format. Instructions: 
+
+    1. Drug and drop email from Email client to Desktop
+    2. Send to IR specialists by <email>
+```
+
+### Python snippet for inserting data
+
+> Remember that you have to put detection rule as `raw_rule`!
+
+```python
+path_to_ra = "RA0001.yml"
+
+with open(path_to_en, "r") as stream:
+    ra = [x for x in yaml.safe_load_all(stream)]
+    data = {"raw_rule": ra}
+
+r = requests.post(
+    "http://127.0.0.1:8000/api/v1/atc/responseaction/",
+    json=data
+)
+```
+
+### Filters
+
+There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
+
+#### Contains
+
+* `title_contains`
+* `stage_contains`
+* `author_contains`
+* `description_contains`
+* `linked_ra_contains`
+
+#### Exact
+
+* `title_exact`
+* `stage_exact`
+* `author_exact`
+* `linked_ra_exact`
 
 ---
 
