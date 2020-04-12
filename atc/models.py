@@ -401,11 +401,9 @@ class ResponsePlaybook(models.Model):
         verbose_name="Description"
     )
 
-    tag = models.ForeignKey(
+    tags = models.ManyToManyField(
         Tag,
         verbose_name="Tag(s)",
-        on_delete=models.SET_NULL,
-        null=True
     )
 
     SEVERITY_CHOIES = [
@@ -456,43 +454,39 @@ class ResponsePlaybook(models.Model):
         verbose_name="Creation date"
     )
 
-    identification = models.ForeignKey(
+    linked_rp = models.ManyToManyField(
+        "self",
+        verbose_name="Linked Response Playbook(s)",
+        blank=True,
+    )
+
+    identification = models.ManyToManyField(
         ResponseAction,
         verbose_name="Identification",
-        on_delete=models.SET_NULL,
-        null=True,
         related_name="identification"
     )
 
-    containment = models.ForeignKey(
+    containment = models.ManyToManyField(
         ResponseAction,
         verbose_name="Containment",
-        on_delete=models.SET_NULL,
-        null=True,
         related_name="containment"
     )
 
-    eradication = models.ForeignKey(
+    eradication = models.ManyToManyField(
         ResponseAction,
         verbose_name="Eradication",
-        on_delete=models.SET_NULL,
-        null=True,
         related_name="eradication"
     )
 
-    recovery = models.ForeignKey(
+    recovery = models.ManyToManyField(
         ResponseAction,
         verbose_name="Recovery",
-        on_delete=models.SET_NULL,
-        null=True,
         related_name="recovery"
     )
 
-    lessons_learned = models.ForeignKey(
+    lessons_learned = models.ManyToManyField(
         ResponseAction,
         verbose_name="Lessons learned",
-        on_delete=models.SET_NULL,
-        null=True,
         related_name="lessons_learned"
     )
 
@@ -519,7 +513,7 @@ class DetectionRule(models.Model):
         verbose_name="Description"
     )
 
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag, blank=True
     )
 

@@ -781,37 +781,214 @@ class ResponseActionSerializer(serializers.ModelSerializer):
         return self.create(validated_data, instance=instance)
 
 
+class ResponsePlaybookListSerializer(serializers.ModelSerializer):
+    """
+    Dirty solution as I don't know how to point to "self" in serializer
+    """
+
+    title = serializers.CharField()
+
+    class Meta:
+        model = models.ResponsePlaybook
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return {"title": data}
+
+
+class ListStringSerializer(serializers.ModelSerializer):
+    """
+    Dirty solution as I don't know how to point to "self" in serializer
+    """
+
+    name = serializers.CharField()
+
+    class Meta:
+        model = models.Tag
+        fields = ["name", ]
+
+    def to_representation(self, value):
+        return value.name
+
+    def to_internal_value(self, data):
+        return data
+
+
+class ResponseActionList2Serializer(serializers.ModelSerializer):
+    """
+    Dirty solution as I don't know how to point to "self" in serializer
+    """
+
+    title = serializers.CharField()
+
+    class Meta:
+        model = models.ResponseAction
+        fields = ["title", ]
+
+    def to_representation(self, value):
+        return value.title
+
+    def to_internal_value(self, data):
+        return data
+
+
+class PAPTLPCharField(serializers.CharField):
+
+    def to_representation(self, value):
+        CHOICES = {
+            'W': 'WHITE',
+            'G': 'GREEN',
+            'A': 'AMBER',
+            'R': 'RED',
+        }
+
+        return CHOICES.get(value)
+
+
 class ResponsePlaybookSerializer(serializers.ModelSerializer):
 
-    # Translate IDs to corresponding field values
-    tag = serializers.CharField(
-        source='tag.name',
+    tags = ListStringSerializer(
+        allow_null=True, required=False, many=True
+    )
+    tlp = PAPTLPCharField(
         allow_null=True, allow_blank=True
     )
-    identification = serializers.CharField(
-        source='identification.title',
+    pap = PAPTLPCharField(
         allow_null=True, allow_blank=True
     )
-    containment = serializers.CharField(
-        source='containment.title',
+    severity = serializers.CharField(
         allow_null=True, allow_blank=True
     )
-    eradication = serializers.CharField(
-        source='eradication.title',
-        allow_null=True, allow_blank=True
+    linked_rp = ResponsePlaybookListSerializer(
+        allow_null=True, required=False, many=True
     )
-    recovery = serializers.CharField(
-        source='recovery.title',
-        allow_null=True, allow_blank=True
+    identification = ResponseActionList2Serializer(
+        allow_null=True, required=False, many=True
     )
-    lessons_learned = serializers.CharField(
-        source='lessons_learned.title',
-        allow_null=True, allow_blank=True
+    containment = ResponseActionList2Serializer(
+        allow_null=True, required=False, many=True
+    )
+    eradication = ResponseActionList2Serializer(
+        allow_null=True, required=False, many=True
+    )
+    recovery = ResponseActionList2Serializer(
+        allow_null=True, required=False, many=True
+    )
+    lessons_learned = ResponseActionList2Serializer(
+        allow_null=True, required=False, many=True
+    )
+    creation_date = serializers.CharField(
+        allow_null=True, required=False
+    )
+    workflow = serializers.CharField(
+        allow_null=True, required=False
     )
 
     class Meta:
         model = models.ResponsePlaybook
         fields = '__all__'
+
+    def create(self, validated_data, instance=None):
+        if 'tags' in validated_data:
+            tags = validated_data.pop('tags')
+        else:
+            tags = []
+
+        if 'linked_rp' in validated_data:
+            linked_rp = validated_data.pop('linked_rp')
+        else:
+            linked_rp = []
+
+        if 'identification' in validated_data:
+            identification = validated_data.pop('identification')
+        else:
+            identification = []
+
+        if 'containment' in validated_data:
+            containment = validated_data.pop('containment')
+        else:
+            containment = []
+
+        if 'eradication' in validated_data:
+            eradication = validated_data.pop('eradication')
+        else:
+            eradication = []
+
+        if 'recovery' in validated_data:
+            recovery = validated_data.pop('recovery')
+        else:
+            recovery = []
+
+        if 'lessons_learned' in validated_data:
+            lessons_learned = validated_data.pop('lessons_learned')
+        else:
+            lessons_learned = []
+
+        if not instance:
+            rplaybook = models.ResponsePlaybook.objects.get_or_create(
+                title=validated_data['title']
+            )[0]
+        else:
+            rplaybook = instance
+
+        if rplaybook.linked_rp:
+            rplaybook.linked_rp.set([])
+
+        rplaybook.title = validated_data.get("title")
+        rplaybook.description = validated_data.get("description")
+
+        if len(validated_data.get("severity")) >= 1 \
+                and validated_data.get(
+                    "severity")[:1].upper() in ['L', 'M', 'H']:
+            rplaybook.severity = validated_data.get(
+                "severity")[:1].upper()
+
+        if len(validated_data.get("tlp")) >= 1 \
+                and validated_data.get(
+                    "tlp")[:1].upper() in ['A', 'G', 'R', 'W']:
+
+            rplaybook.tlp = validated_data.get("tlp")[:1].upper()
+
+        if len(validated_data.get("pap")) >= 1 \
+                and validated_data.get(
+                    "pap")[:1].upper() in ['A', 'G', 'R', 'W']:
+            rplaybook.pap = validated_data.get("pap")[:1].upper()
+
+        rplaybook.author = validated_data.get("author")
+        rplaybook.workflow = validated_data.get("workflow")
+
+        if validated_data.get("creation_date"):
+            str_time = validated_data.get("creation_date")
+            try:
+                rplaybook.creation_date = datetime.strptime(
+                    str_time, "%d.%m.%Y")
+            except ValueError:
+                # Could not parse, place default value
+                pass
+
+        for item in tags:
+            obj = models.Tag.objects.get_or_create(name=item)
+            rplaybook.tags.add(obj[0])
+
+        for item in linked_rp:
+            try:
+                obj = models.ResponsePlaybook.objects.get(title=item["title"])
+                rplaybook.linked_rp.add(obj)
+            except:
+                raise serializers.ValidationError(
+                    f"Response Playbook {item['title']} not found. "
+                    "Push it first before referencing it."
+                )
+
+        rplaybook.save()
+
+        return rplaybook
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data, instance=instance)
 
 
 class DetectionRuleSerializer(serializers.ModelSerializer):
@@ -878,8 +1055,8 @@ class DetectionRuleSerializer(serializers.ModelSerializer):
         detection_rule.author = raw_rule[0].get('author', "unknown")
         detection_rule.raw_rule = json_dumps(raw_rule)
 
-        if detection_rule.tag:
-            detection_rule.tag.set([])
+        if detection_rule.tags:
+            detection_rule.tags.set([])
         if detection_rule.references:
             detection_rule.references.set([])
 
@@ -889,7 +1066,7 @@ class DetectionRuleSerializer(serializers.ModelSerializer):
 
         for name in tags:
             obj = models.Tag.objects.get_or_create(name=name)
-            detection_rule.tag.add(obj[0])
+            detection_rule.tags.add(obj[0])
 
         detection_rule.save()
 
