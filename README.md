@@ -395,8 +395,6 @@ workflow: |
 
 ### Python snippet for inserting data
 
-> Remember that you have to put detection rule as `raw_rule`!
-
 ```python
 path_to_ra = "RA0001.yml"
 
@@ -506,8 +504,6 @@ workflow: |
 ```
 
 ### Python snippet for inserting data
-
-> Remember that you have to put detection rule as `raw_rule`!
 
 ```python
 path_to_rp = "RP_0001.yml"
