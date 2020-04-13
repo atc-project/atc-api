@@ -838,14 +838,7 @@ class ResponseActionList2Serializer(serializers.ModelSerializer):
 class PAPTLPCharField(serializers.CharField):
 
     def to_representation(self, value):
-        CHOICES = {
-            'W': 'WHITE',
-            'G': 'GREEN',
-            'A': 'AMBER',
-            'R': 'RED',
-        }
-
-        return CHOICES.get(value)
+        return value
 
 
 class ResponsePlaybookSerializer(serializers.ModelSerializer):
@@ -940,22 +933,14 @@ class ResponsePlaybookSerializer(serializers.ModelSerializer):
         rplaybook.title = validated_data.get("title")
         rplaybook.description = validated_data.get("description")
 
-        if len(validated_data.get("severity")) >= 1 \
-                and validated_data.get(
-                    "severity")[:1].upper() in ['L', 'M', 'H']:
-            rplaybook.severity = validated_data.get(
-                "severity")[:1].upper()
+        if validated_data.get("severity"):
+            rplaybook.severity = validated_data.get("severity")
 
-        if len(validated_data.get("tlp")) >= 1 \
-                and validated_data.get(
-                    "tlp")[:1].upper() in ['A', 'G', 'R', 'W']:
+        if validated_data.get("tlp"):
+            rplaybook.tlp = validated_data.get("tlp")
 
-            rplaybook.tlp = validated_data.get("tlp")[:1].upper()
-
-        if len(validated_data.get("pap")) >= 1 \
-                and validated_data.get(
-                    "pap")[:1].upper() in ['A', 'G', 'R', 'W']:
-            rplaybook.pap = validated_data.get("pap")[:1].upper()
+        if validated_data.get("pap"):
+            rplaybook.pap = validated_data.get("pap")
 
         rplaybook.author = validated_data.get("author")
         rplaybook.workflow = validated_data.get("workflow")

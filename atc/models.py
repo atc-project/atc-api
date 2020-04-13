@@ -413,34 +413,34 @@ class ResponsePlaybook(models.Model):
     ]
 
     severity = models.CharField(
-        max_length=1,
+        max_length=6,
         choices=SEVERITY_CHOIES,
         verbose_name="Severity"
     )
 
-    TLP_CHOIES = [
-        ('W', 'White'),
-        ('G', 'Green'),
-        ('A', 'Amber'),
-        ('R', 'Red'),
+    TLP_CHOICES = [
+        ('WHITE', 'White'),
+        ('Green', 'Green'),
+        ('Amber', 'Amber'),
+        ('Red', 'Red'),
     ]
 
     tlp = models.CharField(
-        max_length=1,
-        choices=TLP_CHOIES,
+        max_length=5,
+        choices=TLP_CHOICES,
         verbose_name="TLP"
     )
 
-    PAP_CHOIES = [
-        ('W', 'White'),
-        ('G', 'Green'),
-        ('A', 'Amber'),
-        ('R', 'Red'),
+    PAP_CHOICES = [
+        ('WHITE', 'White'),
+        ('Green', 'Green'),
+        ('Amber', 'Amber'),
+        ('Red', 'Red'),
     ]
 
     pap = models.CharField(
-        max_length=1,
-        choices=PAP_CHOIES,
+        max_length=5,
+        choices=PAP_CHOICES,
         verbose_name="PAP"
     )
 

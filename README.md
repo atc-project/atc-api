@@ -8,7 +8,7 @@
 | Data Needed | Fully supported |
 | Enrichments | Fully supported |
 | Response Actions | Fully supported |
-| Response Playbooks | **NOT** supported |
+| Response Playbooks | Fully supported |
 | Detection Rules | Fully supported |
 
 
@@ -355,8 +355,6 @@ There are three types of filters - `exact match`, `contains` and `isnull`. Here 
 
 ### JSON structure
 
-> There are many fields defined which API will accept but in the backend, they are not considered in any way. Use `raw_rule` only!
-
 ```json
 {
     "references": ["https://www.lifewire.com/save-an-email-as-an-eml-file-in-gmail-1171956","https://eml.tooutlook.com/"],
@@ -402,9 +400,9 @@ workflow: |
 ```python
 path_to_ra = "RA0001.yml"
 
-with open(path_to_en, "r") as stream:
+with open(path_to_ra, "r") as stream:
     ra = [x for x in yaml.safe_load_all(stream)]
-    data = {"raw_rule": ra}
+    data = ra
 
 r = requests.post(
     "http://127.0.0.1:8000/api/v1/atc/responseaction/",
@@ -430,6 +428,134 @@ There are two types of filters - `exact match` and `contains`. Here is the list 
 * `stage_exact`
 * `author_exact`
 * `linked_ra_exact`
+
+# Response Playbook
+
+### JSON structure
+
+
+```json
+{
+    "author": "@atc_project",
+    "containment": ["RA_0006_containment_block_domain_on_email",
+                    "RA_0028_containment_block_threat_on_network_level"],
+    "creation_date": "31.01.2019",
+    "description": "Response playbook for Phishing Email case. \n",
+    "eradication": ["RA_0010_eradication_delete_malicious_emails",
+                    "RA_0011_eradication_revoke_compromised_credentials",
+                    "RA_0012_eradication_report_phishing_attack_to_external_companies"],
+    "identification": ["RA_0001_identification_get_original_email",
+                       "RA_0002_identification_extract_observables_from_email",
+                       "RA_0003_identification_make_sure_email_is_a_phising",
+                       "RA_0004_identification_analyse_obtained_indicators_of_compromise",
+                       "RA_0005_identification_find_all_phising_attack_victims",
+                       "RA_0040_identification_put_on_monitoring_compromised_accounts"],
+    "lessons_learned": ["RA_0013_lessons_learned_develop_incident_report",
+                        "RA_0014_lessons_learned_conduct_lessons_learned_exercise"],
+    "linked_rp": ["RP_0002_generic_post_exploitation"],
+    "pap": "WHITE",
+    "severity": "M",
+    "tags": ["attack.initial_access", "attack.t1193", "attack.t1192", "phishing"],
+    "title": "RP_0001_phishing_email",
+    "tlp": "AMBER",
+    "workflow": "1. Execute Response Actions step by step. Some of them directly connected, which means you will not be able to move forward not finishing previous step\n2. Start executing containment and eradication stages concurrently with next identification steps, as soon as you will receive infomration about malicious hosts\n3. If phishing led to code execution or remote access to victim host, immediately start executing Generic Post Exploitation Incident Response Playbook\n4. Save all timestamps of implemented actions in Incident Report draft on the fly, it will save a lot of time\n"
+}
+```
+
+### ATC Detection Rule yaml file
+
+```yaml
+title: RP_0001_phishing_email
+description: >
+  Response playbook for Phishing Email case. 
+tags:
+    - attack.initial_access
+    - attack.t1193
+    - attack.t1192
+    - phishing
+severity: M
+tlp: AMBER
+pap: WHITE
+author: '@atc_project'
+creation_date: 31.01.2019
+linked_rp:
+  - RP_0002_generic_post_exploitation
+identification:
+  - RA_0001_identification_get_original_email
+  - RA_0002_identification_extract_observables_from_email
+  - RA_0003_identification_make_sure_email_is_a_phising
+  - RA_0004_identification_analyse_obtained_indicators_of_compromise
+  - RA_0005_identification_find_all_phising_attack_victims
+  - RA_0040_identification_put_on_monitoring_compromised_accounts
+containment:
+  - RA_0006_containment_block_domain_on_email
+  - RA_0028_containment_block_threat_on_network_level
+eradication:
+  - RA_0010_eradication_delete_malicious_emails
+  - RA_0011_eradication_revoke_compromised_credentials
+  - RA_0012_eradication_report_phishing_attack_to_external_companies
+lessons_learned:
+  - RA_0013_lessons_learned_develop_incident_report
+  - RA_0014_lessons_learned_conduct_lessons_learned_exercise
+workflow: |
+  1. Execute Response Actions step by step. Some of them directly connected, which means you will not be able to move forward not finishing previous step
+  2. Start executing containment and eradication stages concurrently with next identification steps, as soon as you will receive infomration about malicious hosts
+  3. If phishing led to code execution or remote access to victim host, immediately start executing Generic Post Exploitation Incident Response Playbook
+  4. Save all timestamps of implemented actions in Incident Report draft on the fly, it will save a lot of time
+
+```
+
+### Python snippet for inserting data
+
+> Remember that you have to put detection rule as `raw_rule`!
+
+```python
+path_to_rp = "RP_0001.yml"
+
+with open(path_to_rp, "r") as stream:
+    rp = [x for x in yaml.safe_load_all(stream)]
+    data = rp
+
+r = requests.post(
+    "http://127.0.0.1:8000/api/v1/atc/responseplaybook/",
+    json=data
+)
+```
+
+### Filters
+
+There are two types of filters - `exact match` and `contains`. Here is the list of valid filters:
+
+#### Contains
+
+* `title_contains`
+* `description_contains`
+* `severity_contains`
+* `tags_contains`
+* `author_contains`
+* `linked_rp_contains`
+* `identification_contains`
+* `containment_contains`
+* `eradication_contains`
+* `recovery_contains`
+* `lessons_learned_contains`
+
+#### Exact
+
+* `tlp_exact`
+* `pap_exact`
+* `title_exact`
+* `description_exact`
+* `severity_exact`
+* `tags_exact`
+* `author_exact`
+* `linked_rp_exact`
+* `identification_exact`
+* `containment_exact`
+* `eradication_exact`
+* `recovery_exact`
+* `lessons_learned_exact`
+
 
 ---
 

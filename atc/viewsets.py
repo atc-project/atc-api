@@ -511,10 +511,133 @@ class ResponseActionViewSet(viewsets.ModelViewSet):
         )
 
 
+class ResponsePlaybookFilter(filters.FilterSet):
+
+    title_contains = filters.CharFilter(
+        field_name='title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    description_contains = filters.CharFilter(
+        field_name='description', lookup_expr='icontains',
+        distinct=True
+    )
+
+    tags_contains = filters.CharFilter(
+        field_name='tags__name', lookup_expr='icontains',
+        distinct=True
+    )
+
+    author_contains = filters.CharFilter(
+        field_name='author', lookup_expr='icontains',
+        distinct=True
+    )
+
+    linked_rp_contains = filters.CharFilter(
+        field_name='linked_rp__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    identification_contains = filters.CharFilter(
+        field_name='identification__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    containment_contains = filters.CharFilter(
+        field_name='containment__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    eradication_contains = filters.CharFilter(
+        field_name='eradication__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    recovery_contains = filters.CharFilter(
+        field_name='recovery__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    lessons_learned_contains = filters.CharFilter(
+        field_name='lessons_learned__title', lookup_expr='icontains',
+        distinct=True
+    )
+
+    severity_contains = filters.CharFilter(
+        field_name='severity', lookup_expr='icontains',
+        distinct=True
+    )
+
+    severity_exact = filters.CharFilter(
+        field_name='severity', lookup_expr='iexact',
+        distinct=True
+    )
+
+    tlp_exact = filters.CharFilter(
+        field_name='tlp', lookup_expr='iexact',
+        distinct=True
+    )
+
+    pap_exact = filters.CharFilter(
+        field_name='pap', lookup_expr='iexact',
+        distinct=True
+    )
+
+    title_exact = filters.CharFilter(
+        field_name='title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    tags_exact = filters.CharFilter(
+        field_name='tags__name', lookup_expr='iexact',
+        distinct=True
+    )
+
+    author_exact = filters.CharFilter(
+        field_name='author', lookup_expr='iexact',
+        distinct=True
+    )
+
+    linked_rp_exact = filters.CharFilter(
+        field_name='linked_rp__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    identification_exact = filters.CharFilter(
+        field_name='identification__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    containment_exact = filters.CharFilter(
+        field_name='containment__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    eradication_exact = filters.CharFilter(
+        field_name='eradication__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    recovery_exact = filters.CharFilter(
+        field_name='recovery__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    lessons_learned_exact = filters.CharFilter(
+        field_name='lessons_learned__title', lookup_expr='iexact',
+        distinct=True
+    )
+
+    class Meta:
+        model = models.ResponsePlaybook
+        fields = []
+
+
 class ResponsePlaybookViewSet(viewsets.ModelViewSet):
     queryset = models.ResponsePlaybook.objects.all()
     serializer_class = serializers.ResponsePlaybookSerializer
     permission_classes = (permissions.AllowAny,)
+    filterset_class = ResponsePlaybookFilter
 
     def create(self, request, *args, **kwargs):
         data = request.data
