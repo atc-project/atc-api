@@ -18,7 +18,6 @@ from django.conf.urls import url, include
 from django.urls import path
 from django.views.generic.base import RedirectView
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls')),

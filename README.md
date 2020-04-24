@@ -1,6 +1,4 @@
-# **!!!!UNDER DEVELOPMENT!!!!**
-
-# This is an ATC-project API. 
+# This is an ATC-project API
 
 | Entity | Readiness |
 | --- | --- |

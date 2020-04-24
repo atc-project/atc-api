@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+djangorestframework = "==3.10"
+django-filter = "*"
+psycopg2-binary = "*"
+pytz = "*"
+sqlparse = "*"
+requests = "*"
+elasticsearch = "*"
+pytest = "*"
+Django = "==2.2.10"
+Markdown = "*"
+PyYAML = "*"
+Jinja2 = "*"
+gunicorn = "*"
+
+[requires]
+python_version = "3.6"

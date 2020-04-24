@@ -3,7 +3,6 @@ import atc.serializers as serializers
 import json
 from rest_framework import viewsets, permissions
 from django_filters import rest_framework as filters
-# from rest_framework.decorators import action
 
 
 class ReadOnlyPermissions(permissions.BasePermission):
@@ -24,7 +23,7 @@ class ReadOnlyPermissions(permissions.BasePermission):
         return False
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -43,7 +42,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class PlatformViewSet(viewsets.ReadOnlyModelViewSet):
+class PlatformViewSet(viewsets.ModelViewSet):
     queryset = models.Platform.objects.all()
     serializer_class = serializers.PlatformSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -62,7 +61,7 @@ class PlatformViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class LogTypeViewSet(viewsets.ReadOnlyModelViewSet):
+class LogTypeViewSet(viewsets.ModelViewSet):
     queryset = models.LogType.objects.all()
     serializer_class = serializers.LogTypeSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -81,7 +80,7 @@ class LogTypeViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class ChannelViewSet(viewsets.ReadOnlyModelViewSet):
+class ChannelViewSet(viewsets.ModelViewSet):
     queryset = models.Channel.objects.all()
     serializer_class = serializers.ChannelSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -100,7 +99,7 @@ class ChannelViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class ProviderViewSet(viewsets.ReadOnlyModelViewSet):
+class ProviderViewSet(viewsets.ModelViewSet):
     queryset = models.Provider.objects.all()
     serializer_class = serializers.ProviderSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -119,7 +118,7 @@ class ProviderViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class VolumeViewSet(viewsets.ReadOnlyModelViewSet):
+class VolumeViewSet(viewsets.ModelViewSet):
     queryset = models.Volume.objects.all()
     serializer_class = serializers.VolumeSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -138,7 +137,7 @@ class VolumeViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class LogFieldViewSet(viewsets.ReadOnlyModelViewSet):
+class LogFieldViewSet(viewsets.ModelViewSet):
     queryset = models.LogField.objects.all()
     serializer_class = serializers.LogFieldSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -157,7 +156,7 @@ class LogFieldViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class StageViewSet(viewsets.ReadOnlyModelViewSet):
+class StageViewSet(viewsets.ModelViewSet):
     queryset = models.Stage.objects.all()
     serializer_class = serializers.StageSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -176,7 +175,7 @@ class StageViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class EventIdViewSet(viewsets.ReadOnlyModelViewSet):
+class EventIdViewSet(viewsets.ModelViewSet):
     queryset = models.EventID.objects.all()
     serializer_class = serializers.EventIDSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -195,7 +194,7 @@ class EventIdViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
+class TagViewSet(viewsets.ModelViewSet):
     queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -214,7 +213,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class ReferencesViewSet(viewsets.ReadOnlyModelViewSet):
+class ReferencesViewSet(viewsets.ModelViewSet):
     queryset = models.References.objects.all()
     serializer_class = serializers.ReferencesSerializer
     permission_classes = (ReadOnlyPermissions,)
@@ -264,7 +263,6 @@ class LoggingPolicyFilter(filters.FilterSet):
 class LoggingPolicyViewSet(viewsets.ModelViewSet):
     queryset = models.LoggingPolicy.objects.all()
     serializer_class = serializers.LoggingPolicySerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = LoggingPolicyFilter
 
     def create(self, request, *args, **kwargs):
@@ -353,7 +351,6 @@ class DataNeededFilter(filters.FilterSet):
 class DataNeededViewSet(viewsets.ModelViewSet):
     queryset = models.DataNeeded.objects.all()
     serializer_class = serializers.DataNeededSerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = DataNeededFilter
 
     def create(self, request, *args, **kwargs):
@@ -422,7 +419,6 @@ class EnrichmentFilter(filters.FilterSet):
 class EnrichmentViewSet(viewsets.ModelViewSet):
     queryset = models.Enrichment.objects.all()
     serializer_class = serializers.EnrichmentSerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = EnrichmentFilter
 
     def create(self, request, *args, **kwargs):
@@ -494,7 +490,6 @@ class ResponseActionFilter(filters.FilterSet):
 class ResponseActionViewSet(viewsets.ModelViewSet):
     queryset = models.ResponseAction.objects.all()
     serializer_class = serializers.ResponseActionSerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = ResponseActionFilter
 
     def create(self, request, *args, **kwargs):
@@ -636,7 +631,6 @@ class ResponsePlaybookFilter(filters.FilterSet):
 class ResponsePlaybookViewSet(viewsets.ModelViewSet):
     queryset = models.ResponsePlaybook.objects.all()
     serializer_class = serializers.ResponsePlaybookSerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = ResponsePlaybookFilter
 
     def create(self, request, *args, **kwargs):
@@ -739,7 +733,6 @@ class DetectionRuleFilter(filters.FilterSet):
 class DetectionRuleViewSet(viewsets.ModelViewSet):
     queryset = models.DetectionRule.objects.all()
     serializer_class = serializers.DetectionRuleSerializer
-    permission_classes = (permissions.AllowAny,)
     filterset_class = DetectionRuleFilter
 
     def create(self, request, *args, **kwargs):
