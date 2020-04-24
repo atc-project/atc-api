@@ -75,3 +75,7 @@ Successfully tagged atcapi:readmetest
 # Authors
 
 * Jakob Weinzettl, [@mrblacyk](https://github.com/mrblacyk)
+
+# Thanks to
+
+* Mikhail Aksenov, [@AverageS](https://github.com/AverageS), for preparing the initial Django Rest Framework project template
