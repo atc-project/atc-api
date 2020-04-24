@@ -1,15 +1,23 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y locales libxml2-dev libxslt1-dev curl libsasl2-dev python-dev libldap2-dev libssl-dev && locale-gen ru_RU.UTF-8 && apt-get update && apt-get install -y python3-pip
+COPY atccore /atccore
 
-ENV LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8 LC_LANG=ru_RU.UTF-8
+WORKDIR /atccore
 
-COPY requirements.txt /app/requirements.txt
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends python3.6 python3-pip locales python3-setuptools && \
+	rm -rf /var/lib/apt/lists/* && \
+	localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
-RUN pip3 install -r /app/requirements.txt
+ENV LANG en_US.utf8
 
-COPY . /app
+RUN	pip3 install pipenv && \
+	pipenv install && \
+	pipenv run ./manage.py collectstatic && \
+	pipenv run ./manage.py migrate && \
+	pipenv run ./manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@localhost', 'admin')"
 
-WORKDIR /app
-
-CMD "./startup.sh"
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+EXPOSE 8000
+ENTRYPOINT "/entrypoint.sh"

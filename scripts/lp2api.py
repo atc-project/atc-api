@@ -5,6 +5,14 @@ import yaml
 from pprint import pprint
 from os import walk
 
+import getpass
+uinput = input(
+    "[?] Provide a username [" + getpass.getuser() +"]: "
+)
+uinput = uinput or getpass.getuser()
+upassw = getpass.getpass("[?] Provide a password: ")
+print("[+] Got credentials -> " + uinput + ":" + "*" * len(upassw))
+
 # path_to_lp = (
 #     "/home/ubuntu/projects/atc-api/tests/files/"
 #     "LP_0003_windows_sysmon_process_creation.yml"
@@ -21,7 +29,7 @@ for file in filenames:
 
     r = requests.post(
         'http://127.0.0.1:8000/api/v1/atc/loggingpolicy/',
-        json=lp
+        json=lp, auth=(uinput, upassw)
     )
 
     if r.status_code // 100 != 2:

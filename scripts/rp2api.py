@@ -5,6 +5,14 @@ import yaml
 from pprint import pprint
 from os import walk
 
+import getpass
+uinput = input(
+    "[?] Provide a username [" + getpass.getuser() +"]: "
+)
+uinput = uinput or getpass.getuser()
+upassw = getpass.getpass("[?] Provide a password: ")
+print("[+] Got credentials -> " + uinput + ":" + "*" * len(upassw))
+
 # path_to_ra = (
 #     "/home/ubuntu/projects/atc-api/tests/files/"
 #     "RA_0001_identification_get_original_email.yml"
@@ -22,7 +30,7 @@ for file in filenames:
 
     r = requests.post(
         'http://127.0.0.1:8000/api/v1/atc/responseplaybook/',
-        json=rp
+        json=rp, auth=(uinput, upassw)
     )
 
     if r.status_code // 100 != 2:
