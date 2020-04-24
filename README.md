@@ -2,7 +2,7 @@
 
 ![](https://github.com/atc-project/atomic-threat-coverage/raw/master/images/logo_v1.png)
 
-RESTful API built with Django Rest Framework. This project consumes following Atomic Threat Coverage entities and makes them interactive via HTTP methods:
+RESTful API built with Django Rest Framework. This project consumes following [Atomic Threat Coverage](https://github.com/atc-project/atomic-threat-coverage) entities and makes them interactive via HTTP methods:
 
 - **Detection Rules** based on Sigma — Generic Signature Format for SIEM Systems
 - **Data Needed** to be collected to produce detection of specific Threat
