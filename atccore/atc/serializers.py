@@ -510,7 +510,7 @@ class DataNeededSerializer(serializers.ModelSerializer):
             eid = int(validated_data['title'].split("_")[2])
             obj = models.EventID.objects.get_or_create(id=eid)[0]
             dataneeded.eventID.add(obj.id)
-        except ValueError:
+        except (ValueError, IndexError):
             # No EventID in the title
             pass
 
